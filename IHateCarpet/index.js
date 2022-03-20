@@ -8,9 +8,9 @@ register("tick", () => {
     let pX = parseInt(Player.getX())
     let pY = parseInt(Player.getY())
     let pZ = parseInt(Player.getZ())
-    for (let x = pX-2; x <= pX+2; x++) {
-        for (let y = pY-2; y <= pY+2; y++) {
-            for (let z = pZ-2; z <= pZ+2; z++) {
+    for (let x = pX-3; x < pX+2; x++) {
+        for (let y = pY-3; y < pY+2; y++) {
+            for (let z = pZ-3; z < pZ+2; z++) {
                 let block = World.getBlockAt(x, y, z)
                 if (!block || block.type.getID() !== 171) continue
                 carpets.push([block.getState(), x, y, z])
@@ -18,6 +18,7 @@ register("tick", () => {
             }
         }
     }
+    // ChatLib.chat(carpets.length)
 })
 
 register("tick", () => {
@@ -25,7 +26,7 @@ register("tick", () => {
         let x = carpets[i][1]
         let y = carpets[i][2]
         let z = carpets[i][3]
-        if (getDistance(Player.getX(), Player.getY(), Player.getZ(), x, y, z) >= 3) {
+        if (getDistance(parseInt(Player.getX()), parseInt(Player.getY()), parseInt(Player.getZ()), x, y, z) > 3) {
             setBlockState(x, y, z, carpets[i][0])
             carpets.splice(i, 1)
         }
