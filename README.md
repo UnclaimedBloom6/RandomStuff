@@ -1,5 +1,6 @@
 # RandomStuff
- noob xd xd
+A collection of random stuff which aren't significant enough to deserve their own seperate repositories.
+
 
 # IHateCarpet
 Literally just turns carpets near you into ghost blocks temporarily so watchdog screams at you less.
