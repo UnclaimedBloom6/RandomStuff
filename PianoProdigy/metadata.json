@@ -1,0 +1,9 @@
+{
+    "name": "PianoProdigy",
+    "description": "Ping based games are very cool!",
+    "creator": "UnclaimedBloom6",
+    "entry": "index.js",
+    "requires": [
+        "PogData"
+    ]
+}
