@@ -3,15 +3,20 @@ A collection of random stuff which aren't significant enough to deserve their ow
 
 
 # ZeroPingEtherwarp
-Instantly teleports you to the target block when shift + right clicking with an etherwarp item using accurate etherwarp prediction.
+Instantly teleports you to the target block when attempting to etherwarp.
 
-NOTE: RISKY! Currently, the server does not ban for long teleports, so this should be safe to use so long as you don't try to spam it in places where etherwarp is disabled.
-Because I'm not doing any funky packet stuff, this is not true zero ping; as in, you will still need to wait for the server to process the etherwarp before you can change directions. However, it is still a huge improvement over not using it at all.
+Sends packets to simulate true zero ping. After you click, you can immediately change directions and teleport again even before the server has processed the first teleport.
+Safeguards are in place to protect against excessive packets being sent, however there are no checks for whether or not etherwarping is actually possible in the area you're in.
+Use with caution, don't be stupid with it.
 
-You might still be lagged back to the etherwarp location once the server catches up, so expect it to feel a bit janky. This will be less prevalent for players with lower ping.
+Use /zeropingetherwarp or /zpew to show the available commands for the module.
 
-Config gui: /zeropingetherwarp (or /zpew)
+## How it works
+Normally when you etherwarp, you send a use item packet, the server does a raycast to find the block to put you on, and then sends you an S08PacketPlayerPosLook packet to tell your client where you should be teleported to. In response, you send a C06PacketPlayerPosLook packet to confirm the teleport and sync back with the server.
 
+With zero ping etherwarp, when you right click with an etherwarp item, the module will do a raycast and predict where the server will put you, then teleport you to that location and send the C06PacketPlayerPosLook as well. When the server has registered that you've tried to etherwarp and sends the S08PacketPlayerPosLook packet, the coordinates are checked with the ones which the module predicted, and if they match, the packet event is cancelled since the C06 response has already been sent and you are already at that location.
+
+![How it works](https://i.imgur.com/sQTRaEj.png)
 
 # PianoProdigy
 Harp should not be part of progressing.
