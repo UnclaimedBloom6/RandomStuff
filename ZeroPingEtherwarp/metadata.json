@@ -1,11 +1,10 @@
 {
     "name": "ZeroPingEtherwarp",
-    "description": "Immediately teleports you when using Etherwarp.",
     "creator": "UnclaimedBloom6",
     "entry": "index.js",
     "requires": [
         "BloomCore",
-        "Vigilance",
-        "CTAutoComplete"
+        "CTAutoComplete",
+        "PogData"
     ]
 }
