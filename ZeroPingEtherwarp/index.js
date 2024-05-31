@@ -1,5 +1,3 @@
-/// <reference types="../CTAutocomplete" />
-
 import { getEtherwarpBlock, getLastSentLook, getSkyblockItemID } from "../BloomCore/utils/Utils"
 import PogObject from "../PogData"
 
@@ -7,10 +5,12 @@ const S08PacketPlayerPosLook = Java.type("net.minecraft.network.play.server.S08P
 const C06PacketPlayerPosLook = Java.type("net.minecraft.network.play.client.C03PacketPlayer$C06PacketPlayerPosLook")
 const C0BPacketEntityAction = Java.type("net.minecraft.network.play.client.C0BPacketEntityAction")
 
+const C08PacketPlayerBlockPlacement = Java.type("net.minecraft.network.play.client.C08PacketPlayerBlockPlacement")
+
 const dataObject = new PogObject("ZeroPingEtherwarp", {
     firstTime: true,
     enabled: false,
-    keepMotion: true
+    keepMotion: true,
 }, "data.json")
 
 const firstInstallTrigger = register("tick", () => {
@@ -79,6 +79,10 @@ const recentlySentC06s = [] // [{pitch, yaw, x, y, z, sentAt}, ...] in the order
 
 let wasLastSneaking = false // What the server sees you sneaking as
 
+const sendUseItem = () => {
+    Client.sendPacket(new C08PacketPlayerBlockPlacement(Player.getHeldItem()?.getItemStack() ?? null))
+}
+
 const checkAllowedFails = () => {
     // Queue of teleports too long
     if (recentlySentC06s.length >= MAXQUEUEDPACKETS) return false
@@ -109,13 +113,10 @@ register("packetSent", (packet) => {
     if (action == C0BPacketEntityAction.Action.STOP_SNEAKING) wasLastSneaking = false
 }).setFilteredClass(C0BPacketEntityAction)
 
-// The main
-register("playerInteract", (action) => {
-    if (!dataObject.enabled) return
-    
-    if (action.toString() !== "RIGHT_CLICK_EMPTY" || !isHoldingEtherwarpItem() || !getLastSentLook() || !wasLastSneaking) return
-    if (!checkAllowedFails()) return ChatLib.chat(`&cZero ping etherwarp teleport aborted.\n&c${recentFails.length} fails last ${FAILWATCHPERIOD}s\n&c${recentlySentC06s.length} C06's queued currently`)
+register("worldUnload", () => wasLastSneaking = false)
+register("worldLoad", () => wasLastSneaking = false)
 
+const doZeroPingEtherwarp = () => {
     const rt = getEtherwarpBlock(true, 57 + getTunerBonusDistance() - 1)
     if (!rt) return
 
@@ -132,16 +133,27 @@ register("playerInteract", (action) => {
     recentlySentC06s.push({ pitch, yaw, x, y, z, sentAt: Date.now() })
 
     // The danger zone
-    // In the next tick, send the C06 packet which would normally be sent after the server teleports you
+    // At the end of this tick, send the C06 packet which would normally be sent after the server teleports you
     // and then set the player's position to the destination. The C06 being sent is what makes this true zero ping.
-    Client.scheduleTask(1, () => {
+    Client.scheduleTask(0, () => {
         Client.sendPacket(new C06PacketPlayerPosLook(x, y, z, yaw, pitch, Player.asPlayerMP().isOnGround()))
+        // Player.getPlayer().setPosition(x, y, z)
         Player.getPlayer().func_70107_b(x, y, z)
 
+        // .setVelocity()
         if (!dataObject.keepMotion) Player.getPlayer().func_70016_h(0, 0, 0)
     })
+}
 
-})
+// Detect when the player is trying to etherwarp
+register("packetSent", (packet) => {
+    if (!dataObject.enabled) return
+    
+    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !wasLastSneaking) return
+    if (!checkAllowedFails()) return ChatLib.chat(`&cZero ping etherwarp teleport aborted.\n&c${recentFails.length} fails last ${FAILWATCHPERIOD}s\n&c${recentlySentC06s.length} C06's queued currently`)
+
+    doZeroPingEtherwarp()
+}).setFilteredClass(C08PacketPlayerBlockPlacement)
 
 // For whatever rounding errors etc occur
 const isWithinTolerence = (n1, n2) => Math.abs(n1 - n2) < 1e-4

@@ -4,7 +4,6 @@
     "entry": "index.js",
     "requires": [
         "BloomCore",
-        "CTAutoComplete",
         "PogData"
     ]
 }
