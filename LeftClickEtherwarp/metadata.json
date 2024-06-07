@@ -1,0 +1,10 @@
+{
+    "name": "LeftClickEtherwarp",
+    "description": "Etherwarps when left clicking an etherwarp item!",
+    "creator": "UnclaimedBloom6",
+    "entry": "index.js",
+    "requires": [
+        "BloomCore",
+        "PogData"
+    ]
+}

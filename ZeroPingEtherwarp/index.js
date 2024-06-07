@@ -79,10 +79,6 @@ const recentlySentC06s = [] // [{pitch, yaw, x, y, z, sentAt}, ...] in the order
 
 let wasLastSneaking = false // What the server sees you sneaking as
 
-const sendUseItem = () => {
-    Client.sendPacket(new C08PacketPlayerBlockPlacement(Player.getHeldItem()?.getItemStack() ?? null))
-}
-
 const checkAllowedFails = () => {
     // Queue of teleports too long
     if (recentlySentC06s.length >= MAXQUEUEDPACKETS) return false
