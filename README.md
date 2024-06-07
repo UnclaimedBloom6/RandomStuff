@@ -11,6 +11,9 @@ Use with caution, don't be stupid with it.
 
 Use /zeropingetherwarp or /zpew to show the available commands for the module.
 
+# Left Click Etherwarp
+When left clicking with an item with etherwarp on it, will automatically sneak and then right click. Goes well with ZeroPingEtherwarp.
+
 ## How it works
 Normally when you etherwarp, you send a use item packet, the server does a raycast to find the block to put you on, and then sends you an S08PacketPlayerPosLook packet to tell your client where you should be teleported to. In response, you send a C06PacketPlayerPosLook packet to confirm the teleport and sync back with the server.
 
