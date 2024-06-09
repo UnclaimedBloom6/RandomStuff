@@ -143,6 +143,7 @@ const doZeroPingEtherwarp = () => {
 
 // Detect when the player is trying to etherwarp
 register("packetSent", (packet) => {
+    if (!dataObject.enabled) return
     const held = Player.getHeldItem()
     const item = getSkyblockItemID(held)
     if (!isHoldingEtherwarpItem() || !getLastSentLook() || !wasLastSneaking && item !== "ETHERWARP_CONDUIT") return
