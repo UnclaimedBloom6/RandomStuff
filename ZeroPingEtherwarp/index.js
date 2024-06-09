@@ -93,9 +93,9 @@ const isHoldingEtherwarpItem = () => {
     const held = Player.getHeldItem()
     const sbId = getSkyblockItemID(held)
 
-    if (sbId !== "ASPECT_OF_THE_END" && sbId !== "ASPECT_OF_THE_VOID") return false
+    if (sbId !== "ASPECT_OF_THE_END" && sbId !== "ASPECT_OF_THE_VOID" && sbId !== "ETHERWARP_CONDUIT") return false
     
-    return held.getNBT()?.toObject()?.tag?.ExtraAttributes?.ethermerge == 1
+    return (held.getNBT()?.toObject()?.tag?.ExtraAttributes?.ethermerge == 1 || sbId == "ETHERWARP_CONDUIT")
 }
 
 const getTunerBonusDistance = () => {
@@ -143,9 +143,9 @@ const doZeroPingEtherwarp = () => {
 
 // Detect when the player is trying to etherwarp
 register("packetSent", (packet) => {
-    if (!dataObject.enabled) return
-    
-    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !wasLastSneaking) return
+    const held = Player.getHeldItem()
+    const item = getSkyblockItemID(held)
+    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !wasLastSneaking && item !== "ETHERWARP_CONDUIT") return
     if (!checkAllowedFails()) return ChatLib.chat(`&cZero ping etherwarp teleport aborted.\n&c${recentFails.length} fails last ${FAILWATCHPERIOD}s\n&c${recentlySentC06s.length} C06's queued currently`)
 
     doZeroPingEtherwarp()
