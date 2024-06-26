@@ -1,5 +1,4 @@
 const BlockPoss = Java.type("net.minecraft.util.BlockPos")
-const getDistance = (x1, y1, z1, x2, y2, z2) => Math.sqrt((x2-x1)**2 + (y2-y1)**2 + (z2-z1)**2)
 const setAir = (x, y, z) => World.getWorld().func_175698_g(new BlockPoss(x, y, z))
 const setBlockState = (x, y, z, state) => World.getWorld().func_175656_a(new BlockPoss(x, y, z), state)
 
@@ -13,6 +12,8 @@ register("tick", () => {
             for (let z = pZ-3; z < pZ+2; z++) {
                 let block = World.getBlockAt(x, y, z)
                 if (!block || block.type.getID() !== 171) continue
+                let blockBelow = World.getBlockAt(x, y-1, z)
+                if (!blockBelow) continue
                 carpets.push([block.getState(), x, y, z])
                 setAir(x, y, z)
             }
@@ -26,7 +27,7 @@ register("tick", () => {
         let x = carpets[i][1]
         let y = carpets[i][2]
         let z = carpets[i][3]
-        if (getDistance(parseInt(Player.getX()), parseInt(Player.getY()), parseInt(Player.getZ()), x, y, z) > 3) {
+        if (Math.abs(parseInt(Player.getX()) - x) > 3 || Math.abs(parseInt(Player.getY()) - y) > 3 || Math.abs(parseInt(Player.getZ()) - z) > 3) {
             setBlockState(x, y, z, carpets[i][0])
             carpets.splice(i, 1)
         }
