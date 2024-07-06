@@ -240,6 +240,11 @@ export const highlightSlot = (slot, r, g, b, a) => {
     Renderer.drawRect(Renderer.color(r, g, b, a), 0, 0, 16, 16)
 }
 
+let inHoppity = false
+register('step', () => {
+    inHoppity = Scoreboard?.getLines()?.findIndex(line => line?.getName()?.removeFormatting()?.replace(/[^\u0000-\u007F]/g, "")?.includes(' Spring ')) != -1
+}).setFps(1)
+
 export const isHoppity = () => {
-    return Scoreboard?.getLines()?.findIndex(line => line?.getName()?.removeFormatting()?.replace(/[^\u0000-\u007F]/g, "")?.includes(' Spring ')) != -1
+    return inHoppity
 }

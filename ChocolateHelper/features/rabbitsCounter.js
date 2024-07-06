@@ -46,11 +46,10 @@ register('guiClosed', () => { // Save on gui close to avoid the last page not co
         let totalDuplicates = 0;
         let totalUniques = 0;
 
-        [...temporaryMap.keys()].forEach(rarity => {
+        [...temporaryMap.keys()].forEach(rarity => { // Had fun thinking about this
             totalUniques += pogObj.rabbits[rarity].unique = temporaryMap.get(rarity).unique
             totalDuplicates += pogObj.rabbits[rarity].duplicates = temporaryMap.get(rarity).duplicates
             totalPossible += pogObj.rabbits[rarity].total = temporaryMap.get(rarity).total
-
         })
 
         pogObj.rabbits.total = totalPossible
@@ -107,7 +106,7 @@ register('chat', (rarity) => { // Found a rabbit, therefore add to total and uni
     pogObj.save()
 }).setCriteria(/&r&D&LHOPPITY'S HUNT &7You found .+ &.\(&.&.(.+)&.\)!&r/)
 
-register('chat', () => {
+register('chat', () => { // TO DO: Replace with hover in laast message
     if (!lastRarity) return
     pogObj.rabbits[lastRarity.toLowerCase()].unique -= 1
     pogObj.rabbits[lastRarity.toLowerCase()].totalUniques -= 1

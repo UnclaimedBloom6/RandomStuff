@@ -3,14 +3,9 @@ import { isHoppity, pogObj } from "../util/utils";
 
 let colorCodes = ['f', 'a', '9', '5', '6', 'd', 'b']
 let rabbitsArray = Object.keys(pogObj.rabbits).filter(key => key != 'x' && key != 'y' && !key.includes('total'))
-let hoppity = false
-register('step', () => {
-    if (!config.showRabbitCount) return
-    hoppity = isHoppity()
-}).setFps(1)
 
 register('renderOverlay', () => {
-    if (!config.showRabbitCount || !hoppity) return
+    if (!config.showRabbitCount || !isHoppity()) return
     Renderer.drawStringWithShadow(`&3Total Uniques: ${pogObj.rabbits.totalUniques}&8/&3${pogObj.rabbits.total} [${pogObj.rabbits.totalUniques + pogObj.rabbits.totalDuplicates}]`, pogObj.rabbits.x, pogObj.rabbits.y)
     rabbitsArray.forEach((key, index) => {
         let color = `&${colorCodes[index]}`

@@ -15,6 +15,7 @@ register("worldUnload", () => {
 })
 
 register("step", () => {
+    if (!config.eggEsp) return
     const stands = World.getAllEntitiesOfType(EntityArmorStand)
     eggs = []
     stands.forEach(entity => {

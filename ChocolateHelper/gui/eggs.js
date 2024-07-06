@@ -1,25 +1,13 @@
 import { isHoppity, pogObj } from "../util/utils"
 import config from "../util/config"
 
-// Messages 
-// HOPPITY'S HUNT A Chocolate Breakfast Egg has appeared!
-// HOPPITY'S HUNT You found a Chocolate Breakfast Egg near the Mithril Deposits entrance!
-
- // HOPPITY'S HUNT You found Blossom (UNCOMMON)!
- // DUPLICATE RABBIT! +19,316,088 Chocolate
-
-let hoppity = false
-
 const respawnTime = 60*20*1000 // 20 minutes in ms
 let breakfastTimer = null
 let lunchTimer = null
 let dinnerTimer = null
 
-
 register('step', () => {
-    if (!config.showEggTimers) return
-    hoppity = isHoppity()
-    if (!hoppity) return
+    if (!config.showEggTimers || !isHoppity()) return
     breakfastTimer = twentyMinuteTimer(pogObj.eggs.breakfast.lastSpawn, 'breakfast')
     lunchTimer = twentyMinuteTimer(pogObj.eggs.lunch.lastSpawn, 'lunch')
     dinnerTimer = twentyMinuteTimer(pogObj.eggs.dinner.lastSpawn, 'dinner')
@@ -47,7 +35,6 @@ function twentyMinuteTimer(epoch, eggName) {
 
     let ms = respawnTime + epoch - Date.now()
     let totalSeconds = Math.floor(ms / 1000);
-
     
     let minutes = Math.floor(totalSeconds / 60);
     let seconds = totalSeconds % 60;
@@ -57,12 +44,10 @@ function twentyMinuteTimer(epoch, eggName) {
     } else {
         return `${seconds}s`;
     };
-
 }
 
 register('renderOverlay', () => {
-    if (!config.showEggTimers || !hoppity) return
-
+    if (!config.showEggTimers || !isHoppity()) return
     Renderer.drawStringWithShadow(pogObj.eggs.breakfast.isAvailable ? `&6Breakfast: Ready! &8(&6${breakfastTimer}&8)` : `&6Breakfast: ${breakfastTimer}`, pogObj.eggs.x, pogObj.eggs.y)
     Renderer.drawStringWithShadow(pogObj.eggs.lunch.isAvailable ? `&9Lunch: Ready! &8(&9${lunchTimer}&8)` : `&9Lunch: ${lunchTimer}`, pogObj.eggs.x, pogObj.eggs.y + 10)
     Renderer.drawStringWithShadow(pogObj.eggs.dinner.isAvailable ? `&aDinner: Ready! &8(&a${dinnerTimer}&8)` : `&aDinner: ${dinnerTimer}`, pogObj.eggs.x, pogObj.eggs.y + 20)
