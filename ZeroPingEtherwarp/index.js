@@ -3,7 +3,6 @@ import PogObject from "../PogData"
 
 const S08PacketPlayerPosLook = Java.type("net.minecraft.network.play.server.S08PacketPlayerPosLook")
 const C06PacketPlayerPosLook = Java.type("net.minecraft.network.play.client.C03PacketPlayer$C06PacketPlayerPosLook")
-const C0BPacketEntityAction = Java.type("net.minecraft.network.play.client.C0BPacketEntityAction")
 
 const C08PacketPlayerBlockPlacement = Java.type("net.minecraft.network.play.client.C08PacketPlayerBlockPlacement")
 
@@ -77,8 +76,6 @@ const MAXQUEUEDPACKETS = 3 // Longest chain of queued zero ping teleports at a t
 const recentFails = [] // Timestamps of the most recent failed teleports
 const recentlySentC06s = [] // [{pitch, yaw, x, y, z, sentAt}, ...] in the order the packets were sent
 
-let wasLastSneaking = false // What the server sees you sneaking as
-
 const checkAllowedFails = () => {
     // Queue of teleports too long
     if (recentlySentC06s.length >= MAXQUEUEDPACKETS) return false
@@ -101,16 +98,6 @@ const isHoldingEtherwarpItem = () => {
 const getTunerBonusDistance = () => {
     return Player.getHeldItem()?.getNBT()?.toObject()?.tag?.ExtraAttributes?.tuned_transmission || 0
 }
-
-// Only activate when the server knows that you are sneaking
-register("packetSent", (packet) => {
-    const action = packet.func_180764_b()
-    if (action == C0BPacketEntityAction.Action.START_SNEAKING) wasLastSneaking = true
-    if (action == C0BPacketEntityAction.Action.STOP_SNEAKING) wasLastSneaking = false
-}).setFilteredClass(C0BPacketEntityAction)
-
-register("worldUnload", () => wasLastSneaking = false)
-register("worldLoad", () => wasLastSneaking = false)
 
 const doZeroPingEtherwarp = () => {
     const rt = getEtherwarpBlock(true, 57 + getTunerBonusDistance() - 1)
@@ -146,7 +133,7 @@ register("packetSent", (packet) => {
     if (!dataObject.enabled) return
     const held = Player.getHeldItem()
     const item = getSkyblockItemID(held)
-    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !wasLastSneaking && item !== "ETHERWARP_CONDUIT") return
+    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !Player.isSneaking() && item !== "ETHERWARP_CONDUIT") return
     if (!checkAllowedFails()) return ChatLib.chat(`&cZero ping etherwarp teleport aborted.\n&c${recentFails.length} fails last ${FAILWATCHPERIOD}s\n&c${recentlySentC06s.length} C06's queued currently`)
 
     doZeroPingEtherwarp()
