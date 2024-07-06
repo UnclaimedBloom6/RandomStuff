@@ -13,7 +13,6 @@ register('step', () => {
     dinnerTimer = twentyMinuteTimer(pogObj.eggs.dinner.lastSpawn, 'dinner')
 }).setFps(1)
 
-
 register("chat", (egg) => { // 20 minute timer when they appear
     pogObj.eggs[egg.toLowerCase()].isAvailable = true
     pogObj.eggs[egg.toLowerCase()].lastSpawn = Date.now()

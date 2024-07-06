@@ -46,10 +46,11 @@ register('guiClosed', () => { // Save on gui close to avoid the last page not co
         let totalDuplicates = 0;
         let totalUniques = 0;
 
-        [...temporaryMap.keys()].forEach(rarity => { // Had fun thinking about this
+        [...temporaryMap.keys()].forEach(rarity => {
             totalUniques += pogObj.rabbits[rarity].unique = temporaryMap.get(rarity).unique
             totalDuplicates += pogObj.rabbits[rarity].duplicates = temporaryMap.get(rarity).duplicates
             totalPossible += pogObj.rabbits[rarity].total = temporaryMap.get(rarity).total
+
         })
 
         pogObj.rabbits.total = totalPossible
@@ -86,14 +87,15 @@ onSetSlotReceived((item, slot, windowId) => {
     }
 
     if (!rarityMatch) return
-
-    temporaryMap.get(rarityMatch[1].toLowerCase()).total += 1 // Add to the total number of rabbits that exist on that rarity
+    
+    let rarity = rarityMatch[1].toLowerCase()
+    temporaryMap.get(rarity).total += 1 // Add to the total number of rabbits that exist on that rarity
     if (ctItem.getID() == 351) return // If not found dont continue
     
     let duplicates = 0 // 0 by default
     if (duplicateMatch) duplicates = parseInt(duplicateMatch[1])
-    temporaryMap.get(rarityMatch[1].toLowerCase()).unique += 1 // If theres a duplicate match, that means that the rabbit has been found, thus unique
-    temporaryMap.get(rarityMatch[1].toLowerCase()).duplicates += duplicates
+    temporaryMap.get(rarity).unique += 1 // If theres a duplicate match, that means that the rabbit has been found, thus unique
+    temporaryMap.get(rarity).duplicates += duplicates
 })
 
 // Add through eggs
@@ -101,16 +103,16 @@ let lastRarity = null
 register('chat', (rarity) => { // Found a rabbit, therefore add to total and unique
     rarity = rarity.toLowerCase().removeFormatting()
     lastRarity = rarity
-    pogObj.rabbits[rarity.toLowerCase()].unique += 1
-    pogObj.rabbits[rarity.toLowerCase()].totalUniques += 1
+    pogObj.rabbits[rarity].unique += 1
+    pogObj.rabbits[rarity].totalUniques += 1
     pogObj.save()
 }).setCriteria(/&r&D&LHOPPITY'S HUNT &7You found .+ &.\(&.&.(.+)&.\)!&r/)
 
 register('chat', () => { // TO DO: Replace with hover in laast message
     if (!lastRarity) return
-    pogObj.rabbits[lastRarity.toLowerCase()].unique -= 1
-    pogObj.rabbits[lastRarity.toLowerCase()].totalUniques -= 1
-    pogObj.rabbits[lastRarity.toLowerCase()].duplicates += 1
-    pogObj.rabbits[lastRarity.toLowerCase()].totalDuplicates += 1
+    pogObj.rabbits[lastRarity].unique -= 1
+    pogObj.rabbits[lastRarity].totalUniques -= 1
+    pogObj.rabbits[lastRarity].duplicates += 1
+    pogObj.rabbits[lastRarity].totalDuplicates += 1
     pogObj.save()
 }).setCriteria(/DUPLICATE RABBIT! \+.+ Chocolate$/)

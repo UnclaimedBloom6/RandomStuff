@@ -13,7 +13,7 @@ onSetSlotReceived((item, slot) => {
 
     const ctItem = new Item(item)
     const itemName = ctItem.getName()
-    if (itemName.includes('CAUGHT!')) ChatLib.chat(`&7[&aBloom&7]&a Clicked&r ${itemName}`)
+    if (itemName.includes('CAUGHT!')) ChatLib.chat(`&6[ChocolateFactory] &aClicked&r ${itemName}`)
     if (!clickMeItems.some(a => a.test(itemName))) return
 
     if (config.clickMeSound) {
