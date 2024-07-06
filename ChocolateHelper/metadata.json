@@ -1,0 +1,11 @@
+{
+    "name": "ChocolateHelper",
+    "description": "Obesity",
+    "creator": "UnclaimedBloom6",
+    "entry": "index.js",
+    "requires": [
+        "BloomCore",
+        "PogData",
+        "Vigilance"
+    ]
+}
