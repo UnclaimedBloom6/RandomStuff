@@ -1,6 +1,6 @@
 import { appendToFile } from "../../../BloomCore/utils/Utils"
 import config from "../config"
-import { data, employeeCpsValues, updateBestUpgrade } from "../utils"
+import { data, employeeCpsValues, pogObj, updateBestUpgrade } from "../utils"
 
 export const doEmployeeItem = (itemName, lore, slot) => {
     // https://regex101.com/r/bAFbya/2
@@ -36,7 +36,7 @@ export const doEmployeeItem = (itemName, lore, slot) => {
         }
     }
 
-    appendToFile("ChocolateHelper", `debug/${employeeName.replace(/ /g, "_").toLowerCase()}.txt`, `${data.employees[employeeName].cost}`)
+    if (pogObj.debug) appendToFile("ChocolateHelper", `debug/${employeeName.replace(/ /g, "_").toLowerCase()}.txt`, `${data.employees[employeeName].cost}`)
 
     if (data.fullyLoaded && config.upgradeIncludeEmployees) updateBestUpgrade(true)
 
