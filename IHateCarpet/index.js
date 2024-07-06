@@ -4,9 +4,9 @@ const setBlockState = (x, y, z, state) => World.getWorld().func_175656_a(new Blo
 
 let carpets = []
 register("tick", () => {
-    let pX = parseInt(Player.getX())
-    let pY = parseInt(Player.getY())
-    let pZ = parseInt(Player.getZ())
+    const pX = Math.floor(Player.getX())
+    const pY = Math.floor(Player.getY())
+    const pZ = Math.floor(Player.getZ())
     for (let x = pX-3; x < pX+2; x++) {
         for (let y = pY-3; y < pY+2; y++) {
             for (let z = pZ-3; z < pZ+2; z++) {
@@ -23,12 +23,13 @@ register("tick", () => {
 })
 
 register("tick", () => {
+    const x0 = Math.floor(Player.getX())
+    const y0 = Math.floor(Player.getY())
+    const z0 = Math.floor(Player.getZ())
     for (let i = 0; i < carpets.length; i++) {
-        let x = carpets[i][1]
-        let y = carpets[i][2]
-        let z = carpets[i][3]
-        if (Math.abs(parseInt(Player.getX()) - x) > 3 || Math.abs(parseInt(Player.getY()) - y) > 3 || Math.abs(parseInt(Player.getZ()) - z) > 3) {
-            setBlockState(x, y, z, carpets[i][0])
+        let [oldState, x1, y1, z1] = carpets[i]
+        if (Math.abs(x1 - x0) > 3 || Math.abs(y1 - y0) > 3 || Math.abs(z1 - z0) > 3) {
+            setBlockState(x1, y1, z1, oldState)
             carpets.splice(i, 1)
         }
     }
