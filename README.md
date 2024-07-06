@@ -1,6 +1,13 @@
 # RandomStuff
 A collection of random stuff which aren't significant enough to deserve their own seperate repositories.
 
+# ChocolateHelper
+Many features for the Chocolate Factory:
+    - Auto-buy best rabbit
+    - Autoclicker
+    - Overlays
+    - Egg Esp & Timers
+    - Rabbit Count
 
 # ZeroPingEtherwarp
 Instantly teleports you to the target block when attempting to etherwarp.
