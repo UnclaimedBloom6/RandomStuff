@@ -2,6 +2,7 @@ import config from "../util/config";
 import { isHoppity, pogObj } from "../util/utils";
 
 let colorCodes = ['f', 'a', '9', '5', '6', 'd', 'b']
+let rabbitsArray = Object.keys(pogObj.rabbits).filter(key => key != 'x' && key != 'y' && !key.includes('total'))
 let hoppity = false
 register('step', () => {
     if (!config.showRabbitCount) return
@@ -9,9 +10,9 @@ register('step', () => {
 }).setFps(1)
 
 register('renderOverlay', () => {
-    // if (!config.showRabbitCount || !hoppity) return
+    if (!config.showRabbitCount || !hoppity) return
     Renderer.drawStringWithShadow(`&3Total Uniques: ${pogObj.rabbits.totalUniques}&8/&3${pogObj.rabbits.total} [${pogObj.rabbits.totalUniques + pogObj.rabbits.totalDuplicates}]`, pogObj.rabbits.x, pogObj.rabbits.y)
-    Object.keys(pogObj.rabbits).filter(key => key != 'x' && key != 'y' && !key.includes('total')).forEach((key, index) => {
+    rabbitsArray.forEach((key, index) => {
         let color = `&${colorCodes[index]}`
         Renderer.drawStringWithShadow(
             `${color}${key.charAt(0).toUpperCase()+key.slice(1)}: ${pogObj.rabbits[key].unique}&8/${color}${pogObj.rabbits[key].total} [${pogObj.rabbits[key].duplicates}]`,
