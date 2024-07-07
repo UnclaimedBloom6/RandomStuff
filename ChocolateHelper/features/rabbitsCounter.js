@@ -15,7 +15,7 @@ let temporaryMap = new Map([ // Map to store temporarily
 let wId
 let shouldImport = false
 let reachedEnd = false
-let finishedLoading = false
+
 onOpenWindowPacket((title, windowId) => {
     let match = title.match(/§r\((\d+)\/(\d+)\) Hoppity\'s Collection§r/) // §r(1/17) Hoppity's Collection§r
 
@@ -40,8 +40,8 @@ onOpenWindowPacket((title, windowId) => {
     reachedEnd = true
 })
 
-register('guiClosed', () => { // Save on gui close to avoid the last page not counting
-    if (shouldImport && reachedEnd && finishedLoading) {
+register('packetSent', () => { // Save on gui close to avoid the last page not counting
+    if (shouldImport && reachedEnd) {
         let totalPossible = 0;
         let totalDuplicates = 0;
         let totalUniques = 0;
@@ -60,18 +60,13 @@ register('guiClosed', () => { // Save on gui close to avoid the last page not co
         shouldImport = false
         ChatLib.chat('&6[ChocolateFactory] &aSuccessfully updated the rabbit data.')
 
-        if (expectedTotal != totalPossible) {
-            ChatLib.chat('&6[ChocolateFactory] &cUnexpected total number of rabbits, try again but slower.')
-        }
+        if (expectedTotal != totalPossible) ChatLib.chat('&6[ChocolateFactory] &cUnexpected total number of rabbits, try again.')
     }
-})
+}).setFilteredClass(Java.type('net.minecraft.network.play.client.C0DPacketCloseWindow'))
 
 let expectedTotal = -1
 onSetSlotReceived((item, slot, windowId) => {
     if (wId != windowId || slot > 53 || !item) return
-
-    if (slot == 0) finishedLoading = false
-    else if (slot == 53) finishedLoading = true // Makes sure the GUI is loaded before importing
     
     const ctItem = new Item(item)
     const lore = ctItem.getLore()
