@@ -33,7 +33,7 @@ onOpenWindowPacket((title, windowId) => {
         shouldImport = true
         reachedEnd = false
         expectedTotal = -1
-        if (pogObj.rabbits.common.unique == 0) ChatLib.chat('&6[ChocolateFactory] &aScroll through the pages to import the rabbit data. (Don\'t spam click)')
+        if (pogObj.rabbits.common.unique == 0) ChatLib.chat('&6[ChocolateHelper] &aScroll through the pages to import the rabbit data. (Don\'t spam click)')
     }
 
     if (a != b || !shouldImport) return
@@ -94,20 +94,18 @@ onSetSlotReceived((item, slot, windowId) => {
 })
 
 // Add through eggs
-let lastRarity = null
-register('chat', (rarity) => { // Found a rabbit, therefore add to total and unique
+register('chat', (rarity, event) => {
     rarity = rarity.toLowerCase().removeFormatting()
-    lastRarity = rarity
+
+    let hoverValue = new Message(event).getMessageParts().find(text => text.getHoverValue() != null)?.getHoverValue() 
+    if (!hoverValue) return
+
+    if (hoverValue.includes('NEW RABBIT!')) { // https://i.imgur.com/692Fkja.png
     pogObj.rabbits[rarity].unique += 1
     pogObj.rabbits[rarity].totalUniques += 1
+    } else {
+        pogObj.rabbits[rarity].duplicates += 1
+        pogObj.rabbits[rarity].totalDuplicates += 1
+    }
     pogObj.save()
 }).setCriteria(/&r&D&LHOPPITY'S HUNT &7You found .+ &.\(&.&.(.+)&.\)!&r/)
-
-register('chat', () => { // TO DO: Replace with hover in laast message
-    if (!lastRarity) return
-    pogObj.rabbits[lastRarity].unique -= 1
-    pogObj.rabbits[lastRarity].totalUniques -= 1
-    pogObj.rabbits[lastRarity].duplicates += 1
-    pogObj.rabbits[lastRarity].totalDuplicates += 1
-    pogObj.save()
-}).setCriteria(/DUPLICATE RABBIT! \+.+ Chocolate$/)
