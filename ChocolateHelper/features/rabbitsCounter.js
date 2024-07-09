@@ -1,6 +1,8 @@
 import { onOpenWindowPacket, onSetSlotReceived } from "../../BloomCore/utils/Events"
 import { pogObj } from "../util/utils"
 
+const C0DPacketCloseWindow = Java.type('net.minecraft.network.play.client.C0DPacketCloseWindow')
+
 let temporaryMap = new Map([ // Map to store temporarily
     ['common', { unique: 0, duplicates: 0, total: 0 }],
     ['uncommon', { unique: 0, duplicates: 0, total: 0 }],
@@ -41,28 +43,27 @@ onOpenWindowPacket((title, windowId) => {
 })
 
 register('packetSent', () => { // Save on gui close to avoid the last page not counting
-    if (shouldImport && reachedEnd) {
-        let totalPossible = 0;
-        let totalDuplicates = 0;
-        let totalUniques = 0;
+    if (!shouldImport || !reachedEnd) return
 
-        [...temporaryMap.keys()].forEach(rarity => {
-            totalUniques += pogObj.rabbits[rarity].unique = temporaryMap.get(rarity).unique
-            totalDuplicates += pogObj.rabbits[rarity].duplicates = temporaryMap.get(rarity).duplicates
-            totalPossible += pogObj.rabbits[rarity].total = temporaryMap.get(rarity).total
+    let totalPossible = 0;
+    let totalDuplicates = 0;
+    let totalUniques = 0;
 
-        })
+    [...temporaryMap.keys()].forEach(rarity => {
+        totalUniques += pogObj.rabbits[rarity].unique = temporaryMap.get(rarity).unique
+        totalDuplicates += pogObj.rabbits[rarity].duplicates = temporaryMap.get(rarity).duplicates
+        totalPossible += pogObj.rabbits[rarity].total = temporaryMap.get(rarity).total
+    })
 
-        pogObj.rabbits.total = totalPossible
-        pogObj.rabbits.totalDuplicates = totalDuplicates
-        pogObj.rabbits.totalUniques = totalUniques
-        pogObj.save()
-        shouldImport = false
-        ChatLib.chat('&6[ChocolateFactory] &aSuccessfully updated the rabbit data.')
+    pogObj.rabbits.total = totalPossible
+    pogObj.rabbits.totalDuplicates = totalDuplicates
+    pogObj.rabbits.totalUniques = totalUniques
+    pogObj.save()
+    shouldImport = false
+    ChatLib.chat('&6[ChocolateFactory] &aSuccessfully updated the rabbit data.')
 
-        if (expectedTotal != totalPossible) ChatLib.chat('&6[ChocolateFactory] &cUnexpected total number of rabbits, try again.')
-    }
-}).setFilteredClass(Java.type('net.minecraft.network.play.client.C0DPacketCloseWindow'))
+    if (expectedTotal != totalPossible) ChatLib.chat('&6[ChocolateFactory] &cUnexpected total number of rabbits, try again.')
+}).setFilteredClass(C0DPacketCloseWindow)
 
 let expectedTotal = -1
 onSetSlotReceived((item, slot, windowId) => {
@@ -73,8 +74,8 @@ onSetSlotReceived((item, slot, windowId) => {
 
     if (ctItem.getName().includes('Hoppity\'s') && expectedTotal == -1) expectedTotal = parseInt(lore.find(line => line.startsWith("§5§o§2§l§m")).split('/')[1].removeFormatting())
 
-    let duplicateMatch 
-    let rarityMatch
+    let duplicateMatch = null
+    let rarityMatch = null
 
     for (let line of lore) {
         if (!duplicateMatch) duplicateMatch = line.match(/^§5§o§7Duplicates Found: §a(\d+)$/) // §5§o§7Duplicates Found: §a0
@@ -101,13 +102,15 @@ register('chat', (rarity, event) => {
     if (!hoverValue) return
 
     if (hoverValue.includes('NEW RABBIT!')) { // https://i.imgur.com/692Fkja.png
-    pogObj.rabbits[rarity].unique += 1
-    pogObj.rabbits[rarity].totalUniques += 1
-    pogObj.rabbits.totalUniques += 1
-    } else {
+        pogObj.rabbits[rarity].unique += 1
+        pogObj.rabbits[rarity].totalUniques += 1
+        pogObj.rabbits.totalUniques += 1
+    }
+    else {
         pogObj.rabbits[rarity].duplicates += 1
         pogObj.rabbits[rarity].totalDuplicates += 1
         pogObj.rabbits.totalDuplicates += 1
     }
+
     pogObj.save()
 }).setCriteria(/&r&D&LHOPPITY'S HUNT &7You found .+ &.\(&.&.(.+)&.\)!&r/)
