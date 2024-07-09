@@ -103,9 +103,11 @@ register('chat', (rarity, event) => {
     if (hoverValue.includes('NEW RABBIT!')) { // https://i.imgur.com/692Fkja.png
     pogObj.rabbits[rarity].unique += 1
     pogObj.rabbits[rarity].totalUniques += 1
+    pogObj.rabbits.totalUniques += 1
     } else {
         pogObj.rabbits[rarity].duplicates += 1
         pogObj.rabbits[rarity].totalDuplicates += 1
+        pogObj.rabbits.totalDuplicates += 1
     }
     pogObj.save()
 }).setCriteria(/&r&D&LHOPPITY'S HUNT &7You found .+ &.\(&.&.(.+)&.\)!&r/)
