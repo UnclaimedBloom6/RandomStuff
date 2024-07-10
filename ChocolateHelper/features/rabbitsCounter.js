@@ -105,11 +105,13 @@ register('chat', (rarity, event) => {
         pogObj.rabbits[rarity].unique += 1
         pogObj.rabbits[rarity].totalUniques += 1
         pogObj.rabbits.totalUniques += 1
+        pogObj.rabbits.lastUnique = 0
     }
     else {
         pogObj.rabbits[rarity].duplicates += 1
         pogObj.rabbits[rarity].totalDuplicates += 1
         pogObj.rabbits.totalDuplicates += 1
+        pogObj.rabbits.lastUnique += 1
     }
 
     pogObj.save()

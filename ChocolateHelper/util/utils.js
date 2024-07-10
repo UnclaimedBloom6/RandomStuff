@@ -99,6 +99,7 @@ export const pogObj = new PogObject("ChocolateHelper", {
         total: 0,
         totalDuplicates: 0,
         totalUniques: 0,
+        lastUnique: 0,
         x: Renderer.screen.getWidth()/2,
         y: Renderer.screen.getHeight()/2
     }
@@ -151,7 +152,7 @@ export const getRabbitShrineCost = (currentTier) => {
 }
 
 
-const jackrabbitCosts = readFileLines("ChocolateHelper", "upgrades/jackrabbit.txt").map(v => parseInt(v))
+// const jackrabbitCosts = readFileLines("ChocolateHelper", "upgrades/jackrabbit.txt").map(v => parseInt(v))
 
 export const getJackrabbitUpgradeCost = (currentTier) => {
     if (currentTier > jackrabbitCosts.length) return null
@@ -204,7 +205,7 @@ export const updateBestUpgrade = () => {
             const employeeIndex = employees.indexOf(employee)
             if (employeeIndex > 0) {
                 const prevEmployee = employees[employeeIndex-1]
-                const prevEmployeeLevel = data.employees[prevEmployee].level
+                const prevEmployeeLevel = data.employees[prevEmployee]?.level
                 
                 if (prevEmployeeLevel < 20) return
             }
@@ -247,4 +248,13 @@ register('step', () => {
 
 export const isHoppity = () => {
     return inHoppity
+}
+
+export function leftRightAlignFormat(text, counter, totalWidth) {
+    const textWidth = Renderer.getStringWidth(text);
+    const counterWidth = Renderer.getStringWidth(counter);
+    const spaceWidth = Renderer.getStringWidth(" ");
+    const spacesNeeded = Math.max(0, Math.floor((totalWidth - textWidth - counterWidth) / spaceWidth));
+
+    return text + " ".repeat(spacesNeeded) + counter;
 }
