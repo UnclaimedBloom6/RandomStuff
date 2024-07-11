@@ -2,7 +2,7 @@ import config from "../util/config";
 import { isHoppity, leftRightAlignFormat, pogObj } from "../util/utils";
 
 let colorCodes = ['f', 'a', '9', '5', '6', 'd', 'b']
-let rabbitsArray = Object.keys(pogObj.rabbits).filter(key => key != 'x' && key != 'y' && !key.includes('total') && !key.includes('last'))
+let rabbitsArray = Object.keys(pogObj.rabbits).filter(key => key != 'x' && key != 'y' && !"totallast".includes(key))
 
 let messages = []
 let totalMessage
@@ -20,6 +20,7 @@ register('renderOverlay', () => {
 })
 
 register('step', () => {
+    if (!config.showRabbitCount || !isHoppity()) return
     totalMessage = leftRightAlignFormat("&3Total", `${pogObj.rabbits.totalUniques}&8/&3${pogObj.rabbits.total} [${pogObj.rabbits.totalUniques + pogObj.rabbits.totalDuplicates}]`, WIDTH)
     rabbitsArray.forEach((key, index) => {
         let color = `&${colorCodes[index]}`
