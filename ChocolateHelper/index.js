@@ -28,13 +28,14 @@ register("command", (...args) => {
     if (args[0] == "debug") {
         pogObj.debug = !pogObj.debug
         ChatLib.chat(`${prefix} &aDebug mode ${pogObj.debug ? "Enabled" : "&cDisabled"}&a.`)
+        pogObj.debug ? debugLines.register() : debugLines.unregister()
         return
     }
 }).setTabCompletions(["debug"]).setName("chocolatehelper").setAliases(["/ch", "choco"])
 
 
-register("postGuiRender", () => {
-    if (!data.inFactory || !pogObj.debug) return
+const debugLines = register("postGuiRender", () => {
+    if (!data.inFactory) return
 
     const jsonCopy = deepCopyObject(data)
     delete jsonCopy.queuedSlotClicks
@@ -53,4 +54,4 @@ register("postGuiRender", () => {
 
     Renderer.scale(scale)
     Renderer.drawString(jsonStr, 0, 0)
-})
+}).unregister()
