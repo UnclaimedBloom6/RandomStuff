@@ -8,8 +8,22 @@ let dinnerTimer = null
 
 let messages = [] // Breakfast, Lunch, Dinner
 const WIDTH = 150
+let isRegistered = false
+
 register('step', () => {
-    if (!config.showEggTimers || !isHoppity()) return
+    if (!config.showEggTimers) return
+    if (!isHoppity()) {
+        if (isRegistered) {
+            eggDisplay.unregister()
+            isRegistered = false
+        }
+        return
+    } else {
+        if (!isRegistered) {
+            eggDisplay.register()
+            isRegistered = true
+        }
+    }
     breakfastTimer = twentyMinuteTimer(pogObj.eggs.breakfast.lastSpawn, 'breakfast')
     lunchTimer = twentyMinuteTimer(pogObj.eggs.lunch.lastSpawn, 'lunch')
     dinnerTimer = twentyMinuteTimer(pogObj.eggs.dinner.lastSpawn, 'dinner')
@@ -50,12 +64,11 @@ function twentyMinuteTimer(epoch, eggName) {
     };
 }
 
-register('renderOverlay', () => {
-    if (!config.showEggTimers || !isHoppity() || messages.length != 3) return
+const eggDisplay = register('renderOverlay', () => {
     messages.forEach((a, index) => {
         Renderer.drawStringWithShadow(a, pogObj.eggs.x, pogObj.eggs.y + 10*(index+1))
     })
-})
+}).unregister()
 
 register('dragged', (dx, dy, x, y, bn) => {
 	if (!config.eggGui.isOpen() || bn == 2) return
