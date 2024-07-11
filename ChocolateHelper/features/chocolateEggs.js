@@ -1,7 +1,7 @@
 import { renderBoxOutline, renderFilledBox } from "../../BloomCore/RenderUtils"
 import { EntityArmorStand, getEntitySkullTexture, getEntityXYZ } from "../../BloomCore/utils/Utils"
 import config from "../util/config"
-import { pogObj, skullTextures } from "../util/utils"
+import { isHoppity, pogObj, skullTextures } from "../util/utils"
 
 let eggs = []
 let mostRecentEgg = null

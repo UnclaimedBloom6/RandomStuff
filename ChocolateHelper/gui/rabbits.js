@@ -2,7 +2,7 @@ import config from "../util/config";
 import { isHoppity, leftRightAlignFormat, pogObj } from "../util/utils";
 
 let colorCodes = ['f', 'a', '9', '5', '6', 'd', 'b']
-let rabbitsArray = Object.keys(pogObj.rabbits).filter(key => key != 'x' && key != 'y' && !"totallast".includes(key))
+let rabbitsArray = Object.keys(pogObj.rabbits).filter(key => key != 'x' && key != 'y' && !key.includes('total') && !key.includes('last'))
 
 let messages = []
 let totalMessage
@@ -12,7 +12,6 @@ const WIDTH = 150
 
 let isRegistered = false
 const rabbitDisplay = register('renderOverlay', () => {
-    if (!config.showRabbitCount || !isHoppity() || messages.length != 3) return
     Renderer.drawStringWithShadow(messages[0], pogObj.rabbits.x, pogObj.rabbits.y)
     messages[1].forEach((a, index) => {
         Renderer.drawStringWithShadow(a, pogObj.rabbits.x, pogObj.rabbits.y + 10*(index+1))
