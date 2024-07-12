@@ -133,9 +133,9 @@ register("packetSent", (packet) => {
     if (!dataObject.enabled) return
     const held = Player.getHeldItem()
     const item = getSkyblockItemID(held)
-    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !Player.isSneaking() && item !== "ETHERWARP_CONDUIT") return
+    const blockID = Player.lookingAt()?.getType()?.getID();
+    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !Player.isSneaking() && item !== "ETHERWARP_CONDUIT" || blockID === 54 || blockID === 146) return
     if (!checkAllowedFails()) return ChatLib.chat(`&cZero ping etherwarp teleport aborted.\n&c${recentFails.length} fails last ${FAILWATCHPERIOD}s\n&c${recentlySentC06s.length} C06's queued currently`)
-
     doZeroPingEtherwarp()
 }).setFilteredClass(C08PacketPlayerBlockPlacement)
 
@@ -175,3 +175,4 @@ register("packetReceived", (packet, event) => {
     while (recentlySentC06s.length) recentlySentC06s.shift()
 
 }).setFilteredClass(S08PacketPlayerPosLook)
+
