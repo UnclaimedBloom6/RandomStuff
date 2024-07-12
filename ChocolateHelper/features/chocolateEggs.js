@@ -1,10 +1,11 @@
 import { renderBoxOutline, renderFilledBox } from "../../BloomCore/RenderUtils"
 import { EntityArmorStand, getEntitySkullTexture, getEntityXYZ } from "../../BloomCore/utils/Utils"
 import config from "../util/config"
-import { pogObj, skullTextures } from "../util/utils"
+import { isHoppity, pogObj, skullTextures } from "../util/utils"
 
 let eggs = []
 let mostRecentEgg = null
+let isRegistered = false
 
 register("chat", (egg) => {
     mostRecentEgg = egg
@@ -16,6 +17,19 @@ register("worldUnload", () => {
 
 register("step", () => {
     if (!config.eggEsp) return
+    if (!isHoppity()) {
+        if (isRegistered) {
+            eggEsp.unregister()
+            isRegistered = false
+        }
+        return
+    } else {
+        if (!isRegistered) {
+            eggEsp.register()
+            isRegistered = true
+        }
+    }
+
     const stands = World.getAllEntitiesOfType(EntityArmorStand)
     eggs = []
     stands.forEach(entity => {
@@ -47,9 +61,7 @@ register("step", () => {
     })
 }).setFps(1)
 
-register("renderWorld", () => {
-    if (!config.eggEsp || !eggs.length) return
-
+const eggEsp = register("renderWorld", () => {
     eggs.forEach(e => {
         const { entity, color, name } = e
         const [x, y, z] = getEntityXYZ(entity)
@@ -58,4 +70,4 @@ register("renderWorld", () => {
         renderBoxOutline(x, y+1.4, z, 0.8, 0.8, r, g, b, 1, 2, true)
         Tessellator.drawString(name, x, y+3, z)
     })
-})
+}).unregister()

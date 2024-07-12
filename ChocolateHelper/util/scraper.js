@@ -49,6 +49,7 @@ onSetSlotReceived((item, slot, windowId, event) => {
 
     if (!data.inFactory || windowId !== data.windowId || !item) return
 
+    try {
     const ctItem = new Item(item)
     const itemName = ctItem.getName()
     const lore = ctItem.getLore()
@@ -69,5 +70,7 @@ onSetSlotReceived((item, slot, windowId, event) => {
     if (doChocolateProductionItem(itemName, lore)) return
     if (doJackrabbitItem(itemName, lore, slot)) return
     if (doTimeTowerItem(itemName, lore, slot)) return
-
+    } catch(e) {
+        console.log("Error on scraper#onSetSlotReceived: " + e)
+    }
 })
