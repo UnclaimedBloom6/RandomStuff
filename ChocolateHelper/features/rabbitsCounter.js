@@ -60,9 +60,9 @@ register('packetSent', () => { // Save on gui close to avoid the last page not c
     pogObj.rabbits.totalUniques = totalUniques
     pogObj.save()
     shouldImport = false
-    ChatLib.chat('&6[ChocolateFactory] &aSuccessfully updated the rabbit data.')
+    ChatLib.chat('&6[ChocolateHelper] &aSuccessfully updated the rabbit data.')
 
-    if (expectedTotal != totalPossible) ChatLib.chat('&6[ChocolateFactory] &cUnexpected total number of rabbits, try again.')
+    if (expectedTotal != totalPossible) ChatLib.chat('&6[ChocolateHelper] &cUnexpected total number of rabbits, try again.')
 }).setFilteredClass(C0DPacketCloseWindow)
 
 let expectedTotal = -1
@@ -105,7 +105,7 @@ register('chat', (rarity, event) => {
         pogObj.rabbits[rarity].unique += 1
         pogObj.rabbits[rarity].totalUniques += 1
         pogObj.rabbits.totalUniques += 1
-        ChatLib.chat("&6[ChocolateFactory] &aUnique rabbit! Since last: " + pogObj.rabbits.lastUnique)
+        ChatLib.chat("&6[ChocolateHelper] &aUnique rabbit! Since last: " + pogObj.rabbits.lastUnique)
         pogObj.rabbits.lastUnique = 0
     }
     else {
