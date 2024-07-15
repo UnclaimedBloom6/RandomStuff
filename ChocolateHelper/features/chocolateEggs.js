@@ -5,7 +5,6 @@ import { isHoppity, pogObj, skullTextures } from "../util/utils"
 
 let eggs = []
 let mostRecentEgg = null
-let isRegistered = false
 
 register("chat", (egg) => {
     mostRecentEgg = egg
@@ -16,18 +15,11 @@ register("worldUnload", () => {
 })
 
 register("step", () => {
-    if (!config.eggEsp) return
-    if (!isHoppity()) {
-        if (isRegistered) {
-            eggEsp.unregister()
-            isRegistered = false
-        }
+    if (!isHoppity() || !config.eggEsp) {
+        eggEsp.unregister()
         return
     } else {
-        if (!isRegistered) {
-            eggEsp.register()
-            isRegistered = true
-        }
+        eggEsp.register()
     }
 
     const stands = World.getAllEntitiesOfType(EntityArmorStand)

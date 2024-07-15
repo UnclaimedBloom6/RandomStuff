@@ -35,7 +35,7 @@ onOpenWindowPacket((title, windowId) => {
         shouldImport = true
         reachedEnd = false
         expectedTotal = -1
-        if (pogObj.rabbits.common.unique == 0) ChatLib.chat('&6[ChocolateHelper] &aScroll through the pages to import the rabbit data. (Don\'t spam click)')
+        if (pogObj.rabbits.common.unique == 0) ChatLib.chat('&6[ChocolateHelper] &aScroll through the pages to import the rabbit data.')
     }
 
     if (a != b || !shouldImport) return
@@ -105,6 +105,7 @@ register('chat', (rarity, event) => {
         pogObj.rabbits[rarity].unique += 1
         pogObj.rabbits[rarity].totalUniques += 1
         pogObj.rabbits.totalUniques += 1
+        ChatLib.chat("&6[ChocolateFactory] &aUnique rabbit! Since last: " + pogObj.rabbits.lastUnique)
         pogObj.rabbits.lastUnique = 0
     }
     else {
@@ -113,6 +114,5 @@ register('chat', (rarity, event) => {
         pogObj.rabbits.totalDuplicates += 1
         pogObj.rabbits.lastUnique += 1
     }
-
     pogObj.save()
 }).setCriteria(/&r&D&LHOPPITY'S HUNT &7You found .+ &.\(&.&.(.+)&.\)!&r/)
