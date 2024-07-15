@@ -45,14 +45,19 @@ onOpenWindowPacket((title, windowId) => {
 register('packetSent', () => { // Save on gui close to avoid the last page not counting
     if (!shouldImport || !reachedEnd) return
 
-    let totalPossible = 0;
-    let totalDuplicates = 0;
-    let totalUniques = 0;
+    let totalPossible = [...temporaryMap.values()].map(value => value.total).reduce((acc, total) => acc + total, 0)
+    let totalDuplicates = 0
+    let totalUniques = 0
+
+    if (expectedTotal != totalPossible) {
+        ChatLib.chat(`&6[ChocolateHelper] &cUnexpected total number of rabbits (&4${totalPossible}&c)`)
+        return
+    }
 
     [...temporaryMap.keys()].forEach(rarity => {
         totalUniques += pogObj.rabbits[rarity].unique = temporaryMap.get(rarity).unique
         totalDuplicates += pogObj.rabbits[rarity].duplicates = temporaryMap.get(rarity).duplicates
-        totalPossible += pogObj.rabbits[rarity].total = temporaryMap.get(rarity).total
+        pogObj.rabbits[rarity].total = temporaryMap.get(rarity).total
     })
 
     pogObj.rabbits.total = totalPossible
@@ -61,8 +66,6 @@ register('packetSent', () => { // Save on gui close to avoid the last page not c
     pogObj.save()
     shouldImport = false
     ChatLib.chat('&6[ChocolateHelper] &aSuccessfully updated the rabbit data.')
-
-    if (expectedTotal != totalPossible) ChatLib.chat('&6[ChocolateHelper] &cUnexpected total number of rabbits, try again.')
 }).setFilteredClass(C0DPacketCloseWindow)
 
 let expectedTotal = -1
