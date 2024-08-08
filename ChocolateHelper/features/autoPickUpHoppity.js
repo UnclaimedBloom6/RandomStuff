@@ -25,33 +25,26 @@ register('chat', (event) => {
 
 // Auto Buy
 let wId = null
-
 onOpenWindowPacket((title, windowId) => {
-    if (title == '§rHoppity§r') wId = windowId
+    if (title == '§rHoppity§r' && config.autoPickUpCall) wId = windowId
 })
 
 onSetSlotReceived((item, slot, windowId) => {
-    if (wId != windowId || !item || slot > 53) return
+    if (wId != windowId || !item || slot > 53 || !config.autoPickUpCall) return
 
     const ctItem = new Item(item)
     const lore = ctItem.getLore()
 
-    console.log('Received item ' + ctItem.getName() + ' in Hoppity GUI')
-
     if (!lore.some(line => line.includes('Click to trade!'))) return
+    if (lore.some(line => line.includes('You have already found')) && config.buyOnlyUnique) return
 
-    for (let line of lore) {
-        console.log(line + '\n') // TO DO: Make Buy Only Unique work (i dont have the lore)
-    }
-
-    // setTimeout(() => {
-    //     const inv = Player.getContainer()
-    //     let slotToClick = slot
-    //     if (!inv) return
+    setTimeout(() => {
+        const inv = Player.getContainer()
+        let slotToClick = slot
+        if (!inv) return
         
-    //     sendWindowClick(inv.getWindowId(), slotToClick, 0)
-    //     console.log(`Bought ${ctItem.getName()}`)
-    // }, Math.floor(500 + Math.random() * 2000));
+        sendWindowClick(inv.getWindowId(), slotToClick, 0)
+    }, Math.floor(500 + Math.random() * 2000));
 })
 
 
