@@ -21,7 +21,7 @@ register('chat', (event) => {
     isHoppityCalling = false // Avoid it somehow triggering before another call
     let command = new Message(event).getMessageParts().find(text => text.getText().includes('Yes') && text.getClickValue() != null)?.getClickValue()?.replace('/','')
     ChatLib.command(command)
-}).setCriteria(/^Select an option: \[Yes\] \[No\] $/).setContains()
+}).setCriteria(/^Select an option: \[Yes\] \[No\] $/)
 
 // Auto Buy
 let wId = null
