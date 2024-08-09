@@ -8,27 +8,6 @@ let dinnerTimer = null
 
 let messages = [] // Breakfast, Lunch, Dinner
 const WIDTH = 150
-<<<<<<< HEAD
-let isRegistered = false
-
-register('step', () => {
-    if (!config.showEggTimers) return
-    if (!isHoppity()) {
-        if (isRegistered) {
-            eggDisplay.unregister()
-            isRegistered = false
-        }
-        return
-    } else {
-        if (!isRegistered) {
-            eggDisplay.register()
-            isRegistered = true
-        }
-    }
-    breakfastTimer = twentyMinuteTimer(pogObj.eggs.breakfast.lastSpawn, 'breakfast')
-    lunchTimer = twentyMinuteTimer(pogObj.eggs.lunch.lastSpawn, 'lunch')
-    dinnerTimer = twentyMinuteTimer(pogObj.eggs.dinner.lastSpawn, 'dinner')
-=======
 
 register('step', () => {
     if (!config.showEggTimers) return
@@ -45,7 +24,6 @@ register('step', () => {
     breakfastTimer = twentyMinuteTimer(pogObj.eggs.breakfast.lastSpawn, 'breakfast') ?? "Soon!"
     lunchTimer = twentyMinuteTimer(pogObj.eggs.lunch.lastSpawn, 'lunch') ?? "Soon!"
     dinnerTimer = twentyMinuteTimer(pogObj.eggs.dinner.lastSpawn, 'dinner') ?? "Soon!"
->>>>>>> 5b657018353f54ae8b6e0027819804466121d5ce
     messages[0] = leftRightAlignFormat("&6Breakfast", pogObj.eggs.breakfast.isAvailable ? `Ready! &8(&6${breakfastTimer}&8)` : `${breakfastTimer}`, WIDTH)
     messages[1] = leftRightAlignFormat("&9Lunch", pogObj.eggs.lunch.isAvailable ? `Ready! &8(&9${lunchTimer}&8)` : `${lunchTimer}`, WIDTH)
     messages[2] = leftRightAlignFormat("&aDinner", pogObj.eggs.dinner.isAvailable ? `Ready! &8(&a${dinnerTimer}&8)` : `${dinnerTimer}`, WIDTH)
@@ -85,11 +63,7 @@ function twentyMinuteTimer(epoch, eggName) {
 
 const eggDisplay = register('renderOverlay', () => {
     messages.forEach((a, index) => {
-<<<<<<< HEAD
-        Renderer.drawStringWithShadow(a, pogObj.eggs.x, pogObj.eggs.y + 10*(index+1))
-=======
         Renderer.drawStringWithShadow(a, pogObj.eggs.x, pogObj.eggs.y + 10*(index))
->>>>>>> 5b657018353f54ae8b6e0027819804466121d5ce
     })
 }).unregister()
 

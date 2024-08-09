@@ -16,26 +16,11 @@ register("worldUnload", () => {
 })
 
 register("step", () => {
-<<<<<<< HEAD
-    if (!config.eggEsp) return
-    if (!isHoppity()) {
-        if (isRegistered) {
-            eggEsp.unregister()
-            isRegistered = false
-        }
-        return
-    } else {
-        if (!isRegistered) {
-            eggEsp.register()
-            isRegistered = true
-        }
-=======
     if (!isHoppity() || !config.eggEsp) {
         eggEsp.unregister()
         return
     } else {
         eggEsp.register()
->>>>>>> 5b657018353f54ae8b6e0027819804466121d5ce
     }
 
     const stands = World.getAllEntitiesOfType(EntityArmorStand)

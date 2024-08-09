@@ -108,10 +108,7 @@ register('chat', (rarity, event) => {
         pogObj.rabbits[rarity].unique += 1
         pogObj.rabbits[rarity].totalUniques += 1
         pogObj.rabbits.totalUniques += 1
-<<<<<<< HEAD
-=======
         ChatLib.chat("&6[ChocolateHelper] &aUnique rabbit! Since last: " + pogObj.rabbits.lastUnique)
->>>>>>> 5b657018353f54ae8b6e0027819804466121d5ce
         pogObj.rabbits.lastUnique = 0
     }
     else {

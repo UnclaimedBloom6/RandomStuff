@@ -10,10 +10,6 @@ let rabbitsMessages = []
 let uniqueMessage
 const WIDTH = 150
 
-<<<<<<< HEAD
-let isRegistered = false
-=======
->>>>>>> 5b657018353f54ae8b6e0027819804466121d5ce
 const rabbitDisplay = register('renderOverlay', () => {
     Renderer.drawStringWithShadow(messages[0], pogObj.rabbits.x, pogObj.rabbits.y)
     messages[1].forEach((a, index) => {
@@ -24,19 +20,6 @@ const rabbitDisplay = register('renderOverlay', () => {
 
 register('step', () => {
     if (!config.showRabbitCount) return
-<<<<<<< HEAD
-    if (!isHoppity()) {
-        if (isRegistered) {
-            rabbitDisplay.unregister()
-            isRegistered = false
-        }
-        return
-    } else {
-        if (!isRegistered) {
-            rabbitDisplay.register()
-            isRegistered = true
-        }
-=======
     if (config.rabbitsGui.isOpen() && !isHoppity()) testDisplay.register() 
         else testDisplay.unregister()
 
@@ -45,7 +28,6 @@ register('step', () => {
     } else {
         rabbitDisplay.unregister()
         return
->>>>>>> 5b657018353f54ae8b6e0027819804466121d5ce
     }
 
     totalMessage = leftRightAlignFormat("&3Total", `${pogObj.rabbits.totalUniques}&8/&3${pogObj.rabbits.total} [${pogObj.rabbits.totalUniques + pogObj.rabbits.totalDuplicates}]`, WIDTH)
@@ -64,12 +46,8 @@ register('dragged', (dx, dy, x, y, bn) => {
     pogObj.rabbits.x = x
     pogObj.rabbits.y = y
     pogObj.save()
-<<<<<<< HEAD
-})
-=======
 })
 
 const testDisplay = register('renderOverlay', () => {
     Renderer.drawStringWithShadow(leftRightAlignFormat("&3Total", `${pogObj.rabbits.totalUniques}&8/&3${pogObj.rabbits.total} [${pogObj.rabbits.totalUniques + pogObj.rabbits.totalDuplicates}]`, WIDTH), pogObj.rabbits.x, pogObj.rabbits.y)
 }).unregister()
->>>>>>> 5b657018353f54ae8b6e0027819804466121d5ce
