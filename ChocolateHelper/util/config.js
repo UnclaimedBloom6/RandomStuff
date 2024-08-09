@@ -64,6 +64,22 @@ class Config {
     })
     clickMeSound = false;
 
+    @SwitchProperty({
+        name: "Auto Pick Up Hoppity Calls",
+        description: "Automatically picks up and buys the rabbit from Hoppity\'s call (needs the contact)",
+        category: "Clicking",
+        subcategory: "Hoppity"
+    })
+    autoPickUpCall = false;
+
+    @SwitchProperty({
+        name: "Buy Only Unique Rabbits",
+        description: "Doesn\'t buy duplicate rabbits from Hoppity\'s calls.",
+        category: "Clicking",
+        subcategory: "Hoppity"
+    })
+    buyOnlyUnique = false;
+
     // Overlays
 
     @SwitchProperty({
