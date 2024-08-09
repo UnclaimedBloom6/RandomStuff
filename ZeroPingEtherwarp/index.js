@@ -15,6 +15,7 @@ const dataObject = new PogObject("ZeroPingEtherwarp", {
 const firstInstallTrigger = register("tick", () => {
     firstInstallTrigger.unregister()
     if (!dataObject.firstTime) return
+
     dataObject.firstTime = false
     dataObject.save()
 
@@ -86,13 +87,20 @@ const checkAllowedFails = () => {
     return recentFails.length < MAXFAILSPERFAILPERIOD
 }
 
+const validEtherwarpItems = new Set([
+    "ASPECT_OF_THE_END",
+    "ASPECT_OF_THE_VOID",
+    "ETHERWARP_CONDUIT",
+])
+
 const isHoldingEtherwarpItem = () => {
     const held = Player.getHeldItem()
     const sbId = getSkyblockItemID(held)
 
-    if (sbId !== "ASPECT_OF_THE_END" && sbId !== "ASPECT_OF_THE_VOID" && sbId !== "ETHERWARP_CONDUIT") return false
+    if (!validEtherwarpItems.has(sbId)) return false
     
-    return (held.getNBT()?.toObject()?.tag?.ExtraAttributes?.ethermerge == 1 || sbId == "ETHERWARP_CONDUIT")
+    // Etherwarp conduit doesn't have the ethermerge NBT tag, the ability is there by default
+    return held.getNBT()?.toObject()?.tag?.ExtraAttributes?.ethermerge == 1 || sbId == "ETHERWARP_CONDUIT"
 }
 
 const getTunerBonusDistance = () => {
@@ -119,6 +127,7 @@ const doZeroPingEtherwarp = () => {
     // At the end of this tick, send the C06 packet which would normally be sent after the server teleports you
     // and then set the player's position to the destination. The C06 being sent is what makes this true zero ping.
     Client.scheduleTask(0, () => {
+
         Client.sendPacket(new C06PacketPlayerPosLook(x, y, z, yaw, pitch, Player.asPlayerMP().isOnGround()))
         // Player.getPlayer().setPosition(x, y, z)
         Player.getPlayer().func_70107_b(x, y, z)
@@ -128,14 +137,29 @@ const doZeroPingEtherwarp = () => {
     })
 }
 
+// Don't teleport when looking at these blocks
+const blacklistedIds = [
+    54,  // Chest
+    146, // Trapped Chest
+]
+
 // Detect when the player is trying to etherwarp
 register("packetSent", (packet) => {
     if (!dataObject.enabled) return
+
+    // Dir = 255 means no block was clicked
+    const dir = packet.func_149568_f()
+    if (dir !== 255) return
+
     const held = Player.getHeldItem()
     const item = getSkyblockItemID(held)
-    const blockID = Player.lookingAt()?.getType()?.getID();
-    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !Player.isSneaking() && item !== "ETHERWARP_CONDUIT" || blockID === 54 || blockID === 146) return
-    if (!checkAllowedFails()) return ChatLib.chat(`&cZero ping etherwarp teleport aborted.\n&c${recentFails.length} fails last ${FAILWATCHPERIOD}s\n&c${recentlySentC06s.length} C06's queued currently`)
+    const blockID = Player.lookingAt()?.getType()?.getID()
+    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !Player.isSneaking() && item !== "ETHERWARP_CONDUIT" || blacklistedIds.includes(blockID)) return
+    if (!checkAllowedFails()) {
+        ChatLib.chat(`&cZero ping etherwarp teleport aborted.\n&c${recentFails.length} fails last ${FAILWATCHPERIOD}s\n&c${recentlySentC06s.length} C06's queued currently`)
+        return
+    }
+
     doZeroPingEtherwarp()
 }).setFilteredClass(C08PacketPlayerBlockPlacement)
 
@@ -175,4 +199,3 @@ register("packetReceived", (packet, event) => {
     while (recentlySentC06s.length) recentlySentC06s.shift()
 
 }).setFilteredClass(S08PacketPlayerPosLook)
-
