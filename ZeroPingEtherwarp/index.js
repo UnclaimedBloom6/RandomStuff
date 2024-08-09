@@ -199,3 +199,4 @@ register("packetReceived", (packet, event) => {
     while (recentlySentC06s.length) recentlySentC06s.shift()
 
 }).setFilteredClass(S08PacketPlayerPosLook)
+

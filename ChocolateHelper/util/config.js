@@ -22,7 +22,8 @@ import {
 class Config {
     constructor() {
         this.initialize(this)
-        
+        this.addDependency("Move Rabbit Count", "Show Rabbit Count")
+        this.addDependency("Move Egg Timers", "Show Egg Timers")
     }
 
     eggGui = new Gui()

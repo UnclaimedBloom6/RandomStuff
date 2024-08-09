@@ -35,7 +35,7 @@ onOpenWindowPacket((title, windowId) => {
         shouldImport = true
         reachedEnd = false
         expectedTotal = -1
-        if (pogObj.rabbits.common.unique == 0) ChatLib.chat('&6[ChocolateHelper] &aScroll through the pages to import the rabbit data. (Don\'t spam click)')
+        if (pogObj.rabbits.common.unique == 0) ChatLib.chat('&6[ChocolateHelper] &aScroll through the pages to import the rabbit data.')
     }
 
     if (a != b || !shouldImport) return
@@ -45,14 +45,19 @@ onOpenWindowPacket((title, windowId) => {
 register('packetSent', () => { // Save on gui close to avoid the last page not counting
     if (!shouldImport || !reachedEnd) return
 
-    let totalPossible = 0;
-    let totalDuplicates = 0;
-    let totalUniques = 0;
+    let totalPossible = [...temporaryMap.values()].map(value => value.total).reduce((acc, total) => acc + total, 0)
+    let totalDuplicates = 0
+    let totalUniques = 0
+
+    if (expectedTotal != totalPossible) {
+        ChatLib.chat(`&6[ChocolateHelper] &cUnexpected total number of rabbits (&4${totalPossible}&c)`)
+        return
+    }
 
     [...temporaryMap.keys()].forEach(rarity => {
         totalUniques += pogObj.rabbits[rarity].unique = temporaryMap.get(rarity).unique
         totalDuplicates += pogObj.rabbits[rarity].duplicates = temporaryMap.get(rarity).duplicates
-        totalPossible += pogObj.rabbits[rarity].total = temporaryMap.get(rarity).total
+        pogObj.rabbits[rarity].total = temporaryMap.get(rarity).total
     })
 
     pogObj.rabbits.total = totalPossible
@@ -60,9 +65,7 @@ register('packetSent', () => { // Save on gui close to avoid the last page not c
     pogObj.rabbits.totalUniques = totalUniques
     pogObj.save()
     shouldImport = false
-    ChatLib.chat('&6[ChocolateFactory] &aSuccessfully updated the rabbit data.')
-
-    if (expectedTotal != totalPossible) ChatLib.chat('&6[ChocolateFactory] &cUnexpected total number of rabbits, try again.')
+    ChatLib.chat('&6[ChocolateHelper] &aSuccessfully updated the rabbit data.')
 }).setFilteredClass(C0DPacketCloseWindow)
 
 let expectedTotal = -1
@@ -105,6 +108,10 @@ register('chat', (rarity, event) => {
         pogObj.rabbits[rarity].unique += 1
         pogObj.rabbits[rarity].totalUniques += 1
         pogObj.rabbits.totalUniques += 1
+<<<<<<< HEAD
+=======
+        ChatLib.chat("&6[ChocolateHelper] &aUnique rabbit! Since last: " + pogObj.rabbits.lastUnique)
+>>>>>>> 5b657018353f54ae8b6e0027819804466121d5ce
         pogObj.rabbits.lastUnique = 0
     }
     else {
@@ -113,6 +120,5 @@ register('chat', (rarity, event) => {
         pogObj.rabbits.totalDuplicates += 1
         pogObj.rabbits.lastUnique += 1
     }
-
     pogObj.save()
 }).setCriteria(/&r&D&LHOPPITY'S HUNT &7You found .+ &.\(&.&.(.+)&.\)!&r/)
