@@ -13,6 +13,7 @@ import "./features/clickMe"
 import "./features/guiElements"
 import "./features/noItemPickup"
 import "./features/rabbitsCounter"
+import "./features/autoPickUpHoppity"
 import { deepCopyObject } from "../BloomCore/utils/Utils"
 
 import './gui/eggs'
