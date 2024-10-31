@@ -10,7 +10,7 @@ let messages = [] // Breakfast, Lunch, Dinner
 const WIDTH = 150
 
 register('step', () => {
-    if (!config.showEggTimers) return
+    if (!config.showEggTimers) return eggDisplay.unregister()
     if (config.eggGui.isOpen() && !isHoppity()) testDisplay.register() 
     else testDisplay.unregister()
 
