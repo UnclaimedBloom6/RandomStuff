@@ -3,6 +3,7 @@ import PogObject from "../PogData"
 
 const S08PacketPlayerPosLook = Java.type("net.minecraft.network.play.server.S08PacketPlayerPosLook")
 const C06PacketPlayerPosLook = Java.type("net.minecraft.network.play.client.C03PacketPlayer$C06PacketPlayerPosLook")
+const C0BPacketEntityAction = Java.type("net.minecraft.network.play.client.C0BPacketEntityAction")
 
 const C08PacketPlayerBlockPlacement = Java.type("net.minecraft.network.play.client.C08PacketPlayerBlockPlacement")
 
@@ -76,6 +77,26 @@ const MAXFAILSPERFAILPERIOD = 3 // 3 fails allowed per 20 seconds. Higher number
 const MAXQUEUEDPACKETS = 3 // Longest chain of queued zero ping teleports at a time
 const recentFails = [] // Timestamps of the most recent failed teleports
 const recentlySentC06s = [] // [{pitch, yaw, x, y, z, sentAt}, ...] in the order the packets were sent
+let isSneaking = false
+
+register("packetSent", (packet) => {
+    const action = packet.func_180764_b()
+
+    if (action == C0BPacketEntityAction.Action.START_SNEAKING) {
+        isSneaking = true
+    }
+    else if (action == C0BPacketEntityAction.Action.STOP_SNEAKING) {
+        isSneaking = false
+    }
+}).setFilteredClass(C0BPacketEntityAction)
+
+register("worldUnload", () => {
+    isSneaking = false
+})
+
+register("worldLoad", () => {
+    isSneaking = false
+})
 
 const checkAllowedFails = () => {
     // Queue of teleports too long
@@ -154,7 +175,7 @@ register("packetSent", (packet) => {
     const held = Player.getHeldItem()
     const item = getSkyblockItemID(held)
     const blockID = Player.lookingAt()?.getType()?.getID()
-    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !Player.isSneaking() && item !== "ETHERWARP_CONDUIT" || blacklistedIds.includes(blockID)) return
+    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !isSneaking && item !== "ETHERWARP_CONDUIT" || blacklistedIds.includes(blockID)) return
     if (!checkAllowedFails()) {
         ChatLib.chat(`&cZero ping etherwarp teleport aborted.\n&c${recentFails.length} fails last ${FAILWATCHPERIOD}s\n&c${recentlySentC06s.length} C06's queued currently`)
         return

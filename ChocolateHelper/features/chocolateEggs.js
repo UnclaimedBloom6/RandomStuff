@@ -27,7 +27,9 @@ register("step", () => {
     eggs = []
     stands.forEach(entity => {
         const skullTexture = getEntitySkullTexture(entity)
+
         if (!skullTexture) return
+
         Object.entries(skullTextures).forEach(([eggName, eggTexture]) => {
             if (skullTexture !== eggTexture) return
 
@@ -42,8 +44,10 @@ register("step", () => {
                     ChatLib.command(`ac ${mostRecentEgg} is at x: ${Math.floor(x)}, y: ${Math.floor(y+1)}, z: ${Math.floor(z)}`, false)
                 }
             }
+
+            let eggType = eggName.split(' ')[1].toLowerCase()
             
-            if (pogObj.eggs[eggName.split(' ')[1].toLowerCase()].isAvailable) r = 0
+            if (eggType in pogObj.eggs && pogObj.eggs[eggType].isAvailable) r = 0
 
             eggs.push({
                 entity: entity,
