@@ -33,7 +33,7 @@ Since inventory interactions are ping dependent, people with low ping will be ab
 
 I'm not sure how safe it would be from a watchdog perspective, but if you have <50ms ping, and set the delay to 50ms or less, please send me a video of what it looks like looting a whole bunch of chests because I think that would be hilarious.
 
-Here's a small demo of the module looting a bunch of M5 runs with a delay of 250ms, chest keys enabled and no kismets: ![video](https://youtu.be/LUuHczvyfpE)
+Here's a small demo of the module looting a bunch of M5 runs with a delay of 250ms, chest keys enabled and no kismets: https://youtu.be/LUuHczvyfpE
 
 # ZeroPingEtherwarp
 Instantly teleports you to the target block when attempting to etherwarp.
