@@ -393,7 +393,7 @@ const printSettings = () => {
 }
 
 register("command", (...args) => {
-    if (!args) {
+    if (!args || !args[0]) {
         printHelp()
         return
     }
