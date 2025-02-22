@@ -465,7 +465,7 @@ register("command", (...args) => {
     }
 
     if (args[0] == "key" || args[0] == "chestkey") {
-        let value = parseInt(args[1].replace(/[,._]/g, ""))
+        let value = parseInt(args[1]?.replace(/[,_]/g, ""))
         if (!isNaN(value)) {
             acPogObj.chestKeyMinProfit = value
             ChatLib.chat(`Min chest key profit is now ${formatNumber(value)}`)

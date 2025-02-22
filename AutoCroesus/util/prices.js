@@ -44,9 +44,9 @@ export const loadWorthless = () => {
     }
 }
 
-let cachedBzValues = null
-let cachedItems = null
-let cachedBins = null
+let cachedBzValues = {}
+let cachedItems = {}
+let cachedBins = {}
 
 let itemIdMap = {} // {sbID: APIItemData}
 
