@@ -18,10 +18,10 @@ This process will continue for every chest, and will also loot chests on other p
 
 When the loot for a run is calculated, it will log the floor, the run score, the chest cost and all of the items which will be claimed to a file which can be viewed at any time in the future with the "/autocroesus loot" command. This will show every single item and essence which this module has claimed, and will show you on average how much profit each run on that floor is worth based on your runs.
 This command has several filters available to only show runs on a specific floor, with a specific score, and only show the first x runs etc, so run "/autocroesus loot help" for an example on how to use it.
-[runlogs](https://i.imgur.com/ErOcENh.png)
+![runlogs](https://i.imgur.com/ErOcENh.png)
 
 The module also contains an overlay which highlights runs which haven't been looted yet and shows the profits for each chest (sorted in descending order) without the auto claiming part being enabled.
-[overlay](https://i.imgur.com/KMCPnXq.png)
+![overlay](https://i.imgur.com/KMCPnXq.png)
 
 Due to the risk associated with items having their prices be manipulated, there are two lists of items included with the module:
 * An "Always Buy" list, where no matter how much profit the overall chest is, if it contains one of these items then the chest will always be opened.
@@ -33,7 +33,7 @@ Since inventory interactions are ping dependent, people with low ping will be ab
 
 I'm not sure how safe it would be from a watchdog perspective, but if you have <50ms ping, and set the delay to 50ms or less, please send me a video of what it looks like looting a whole bunch of chests because I think that would be hilarious.
 
-Here's a small demo of the module looting a bunch of M5 runs with a delay of 250ms, chest keys enabled and no kismets: (video)[https://www.youtube.com/watch?v=LUuHczvyfpE]
+Here's a small demo of the module looting a bunch of M5 runs with a delay of 250ms, chest keys enabled and no kismets: ![video](https://youtu.be/LUuHczvyfpE)
 
 # ZeroPingEtherwarp
 Instantly teleports you to the target block when attempting to etherwarp.
