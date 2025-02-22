@@ -1,5 +1,20 @@
+# Zero Ping Etherwarp
 ZeroPingEtherwarp/data.json
+
+# Left Click Etherwarp
 LeftClickEtherwarp/data/data.json
+
+# Chocolate Helper
 ChocolateHelper/data/
 ChocolateHelper/debug/
 ChocolateHelper/upgrades/
+
+# Auto Croesus
+AutoCroesus/out
+AutoCroesus/data/always_buy.txt
+AutoCroesus/data/worthless.txt
+AutoCroesus/data/binValues.json
+AutoCroesus/data/bzValues.json
+AutoCroesus/data/data.json
+AutoCroesus/data/items.json
+AutoCroesus/data/runLoot.txt

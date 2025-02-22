@@ -1,0 +1,11 @@
+{
+    "name": "AutoCroesus",
+    "description": "I hate croesus",
+    "creator": "UnclaimedBloom6",
+    "entry": "index.js",
+    "requires": [
+        "PogData",
+        "requestV2",
+        "PromiseV2"
+    ]
+}
