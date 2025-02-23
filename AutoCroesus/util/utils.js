@@ -162,7 +162,9 @@ export const findUnopenedChest = (inv, excludedIndexes=[], page, canKismet=true)
         let item = items[ind]
 
         // They are ordered, none can appear after here
-        if (!item) return [null, null]
+        if (!item) {
+            return [null, null]
+        }
 
         if (item.getRegistryName() !== "minecraft:skull") {
             continue
@@ -174,14 +176,19 @@ export const findUnopenedChest = (inv, excludedIndexes=[], page, canKismet=true)
 
         // Find the floor
         let dungeonType = item.getName().removeFormatting()
-        let floorMatch = item.getLore()[1].match(/^(?:§.)+Tier: §eFloor ([IVX]+)$/)
+        let floorMatch = item.getLore()[1].match(/^(?:§.)+Tier: §eFloor (\w+)$/)
         if (!floorMatch) {
             excludedIndexes.push(extendedIndex)
             return [null, null]
         }
 
+        let floorNum = parseInt(floorMatch[1])
+        if (isNaN(floorNum)) {
+            floorNum = decodeNumeral(floorMatch[1])
+        }
+
         let floorLetter = dungeonType == "Master Mode The Catacombs" ? "M" : "F"
-        let floorNum = decodeNumeral(floorMatch[1])
+        // let floorNum = decodeNumeral(floorMatch[1])
         let floor = `${floorLetter}${floorNum}`
 
         // Kismetting for this floor has been disabled for this session
@@ -231,12 +238,15 @@ export const decodeNumeral = (numeral) => {
 }
 
 const tryParseBook = (line) => {
-    const match = line.match(/^§5§o§aEnchanted Book \((§d§l)?([\w ]+) ([IVX]+)§a\)$/) // https://regex101.com/r/EQNCR9/1
+    const match = line.match(/^§5§o§aEnchanted Book \((§d§l)?([\w ]+) (\w+)§a\)$/) // https://regex101.com/r/EQNCR9/2
     if (!match) return null
 
-    const [_, ultFormatting, bookName, tierNumeral] = match
+    const [_, ultFormatting, bookName, tierStr] = match
 
-    const tier = decodeNumeral(tierNumeral)
+    let tier = parseInt(tierStr)
+    if (isNaN(tier)) {
+        tier = decodeNumeral(tierStr)
+    }
     const ult = !!ultFormatting
 
     const sbID = `ENCHANTMENT_${ult ? "ULTIMATE_" : ""}${bookName.toUpperCase().replace(/ /g, "_")}_${tier}`.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
