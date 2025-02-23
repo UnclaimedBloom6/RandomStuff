@@ -332,6 +332,7 @@ const reset = () => {
     indexToClick = null
     tryingToKismet = false
     canKismet = true
+    failedIndexes = []
 }
 
 const startClaiming = () => {
