@@ -235,7 +235,7 @@ register("tick", () => {
     currChestData = chestData
 
     if (autoClaiming) {
-        const bedrockChest = chestData.find(a => a.chestName == "Bedrock")
+        const bedrockChest = chestData.find(a => a.chestName == "Bedrock") ?? null
         const hasAlwaysBuyItem = bedrockChest && bedrockChest.items.some(a => alwaysBuy.has(a.id))
 
         if (!hasAlwaysBuyItem && !chestClaimInfo.skipKismet && acPogObj.useKismets && bedrockChest !== null && acPogObj.kismetFloors.includes(chestClaimInfo.floor)) {
@@ -307,7 +307,6 @@ register("tick", () => {
             return
         }
 
-        // appendToFile("Blooom", "debug/dump.txt", kismetSlot.getLore().join("\n"))
         chestClaimInfo.skipKismet = true
         indexToClick = 50
         return
