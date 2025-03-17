@@ -213,7 +213,7 @@ register("tick", () => {
 
         if (!success) {
             if (chestClaimInfo) {
-                ChatLib.chat(`Failed to check ${chestFormatted} Chest&r:\n&eThis run will be skipped as the info for this chest is incomplete.`)
+                ChatLib.chat(`Failed to check ${chestFormatted} Chest: &r${rewardData}\n&eThis run will be skipped as the info for this chest is incomplete.`)
                 failedIndexes.push(chestClaimInfo.runSlot + (chestClaimInfo.page - 1) * 54)
                 chestClaimInfo = null
                 // Go back to main croesus menu
@@ -251,7 +251,7 @@ register("tick", () => {
         ChatLib.chat(`Claiming the ${chestData[0].chestColor}${chestData[0].chestName} Chest`)
 
         const chestsToClaim = [chestData[0]]
-        if (chestData[1].profit >= acPogObj.chestKeyMinProfit) {
+        if (chestData[1].profit >= acPogObj.chestKeyMinProfit && acPogObj.useChestKeys) {
             ChatLib.chat(`Using chest key on the ${chestData[1].chestColor}${chestData[1].chestName} Chest`)
             chestClaimInfo.chestSlot = chestData[1].slot
             chestsToClaim.push(chestData[1])

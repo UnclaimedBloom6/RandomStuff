@@ -155,7 +155,7 @@ export const updatePrices = () => new Promise((resolve, reject) => {
             json: true
         }),
         request({
-            url: "https://moulberry.codes/lowestbin.json" ,
+            url: "https://moulberry.codes/lowestbin.json",
             json: true
         }),
     ]).then(([bzResp, itemResp, binResp]) => {
