@@ -1,6 +1,7 @@
 
 import { handleLootCommand, logLoot } from "./extra/lootLogs"
 import { printHelp } from "./util/help_command"
+import logger from "./util/logger"
 import { addAlwaysBuy, addWorthlessItem, alwaysBuy, initAlwaysBuy, initWorthless, loadAlwaysBuy, loadWorthless, updatePrices, worthless } from "./util/prices"
 import {
     acPogObj,
@@ -41,6 +42,7 @@ let waitingForCroesus = false // Waiting for croesus to open, no spam clicking!
 let waitingForRunToOpen = false
 let waitingForChestToOpen = false // Prevents spam clicking
 let lastPageOn = null // More spam click prevention!
+let waitingOnPage = null
 
 let tryingToKismet = false
 let canKismet = true // Flips to false if kismetting is enabled but no kismets are available
@@ -97,7 +99,7 @@ register("tick", () => {
     const items = inv.getItems()
     const page = getCurrPage()
 
-    if (page == null) return
+    if (page == null || waitingOnPage !== null && page !== waitingOnPage) return
 
     // chestClaimInfo is already set, which means we're coming back from opening another chest (probably using a chest key or kismet)
     if (chestClaimInfo && chestClaimInfo.runSlot !== null) {
@@ -130,6 +132,7 @@ register("tick", () => {
             skipKismet: false, // Used when a chest has already been rerolled
         }
 
+        logger.push(`Clicking unopened chest at slot index ${slotIndex} (${slotIndex % 54})`)
         waitingForRunToOpen = true
         indexToClick = slotIndex
         return
@@ -138,12 +141,16 @@ register("tick", () => {
     if (items[53] && items[53].getRegistryName() == "minecraft:arrow") {
         if (lastPageOn == page) return
 
+        logger.push("Moving to next page")
         lastPageOn = page
         indexToClick = 53
+        waitingOnPage = page + 1
         return
     }
 
+    logger.push("All done!")
     ChatLib.chat(`&aAll chests looted!`)
+    logger.write()
     reset()
     Client.currentGui.close()
 })
@@ -168,10 +175,12 @@ register("tick", () => {
 
     waitingForRunToOpen = false
     lastPageOn = null
+    waitingOnPage = null
 
     if (chestClaimInfo && chestClaimInfo.chestSlot !== null) {
         waitingForChestToOpen = true
         indexToClick = chestClaimInfo.chestSlot
+        logger.push(`Clicking ${indexToClick} early and returning`)
         chestClaimInfo.chestSlot = null
         return
     }
@@ -187,21 +196,44 @@ register("tick", () => {
         if (!item) continue
 
         let match = item.getName().match(CHEST_REGEX)
-        if (!match) continue
+        if (!match) {
+            // No spamming logs
+            if (autoClaiming) {
+                logger.push(`index ${i} does not match chest regex: "${item.getName()}"`)
+            }
+                
+            continue
+        }
 
         let [_, color, chestName] = match
 
         let lore = item.getLore()
-        let lootEnd = lore.indexOf("§5§o")
+        let lootEnd = lore.indexOf("§5§o") // Empty line at the bottom of 
         let chestFormatted = `${color}${chestName}`
 
+        // No spamming logs
+        if (autoClaiming) {
+            logger.push(`Chest Name: "${chestName}", Formatted: "${chestFormatted}", lootEnd: ${lootEnd}\nLore:\n    ${lore.join("\n    ")}`)
+        }
+            
+
         if (!lootEnd) {
+            // No spamming logs
+            if (autoClaiming) {
+                logger.push(`Loot end not found`)
+            }
+                
             ChatLib.chat(`&cCould not find loot end!`)
             reset()
             return
         }
 
         let costInd = lore.indexOf("§5§o§7Cost")
+        // No spamming logs
+        if (autoClaiming) {
+            logger.push(`Cost index is ${costInd}`)
+        }
+            
         if (!costInd) {
             ChatLib.chat(`&cCould not find cost index!`)
             reset()
@@ -213,6 +245,9 @@ register("tick", () => {
 
         if (!success) {
             if (chestClaimInfo) {
+                if (autoClaiming) {
+                    logger.push(`Failed to check this chest: ${rewardData}`)
+                }
                 ChatLib.chat(`Failed to check ${chestFormatted} Chest: &r${rewardData}\n&eThis run will be skipped as the info for this chest is incomplete.`)
                 failedIndexes.push(chestClaimInfo.runSlot + (chestClaimInfo.page - 1) * 54)
                 chestClaimInfo = null
@@ -234,42 +269,42 @@ register("tick", () => {
 
     currChestData = chestData
 
-    if (autoClaiming) {
-        const bedrockChest = chestData.find(a => a.chestName == "Bedrock") ?? null
-        const hasAlwaysBuyItem = bedrockChest && bedrockChest.items.some(a => alwaysBuy.has(a.id))
+    if (!autoClaiming) return
+    
+    const bedrockChest = chestData.find(a => a.chestName == "Bedrock") ?? null
+    const hasAlwaysBuyItem = bedrockChest && bedrockChest.items.some(a => alwaysBuy.has(a.id))
 
-        if (!hasAlwaysBuyItem && !chestClaimInfo.skipKismet && acPogObj.useKismets && bedrockChest !== null && acPogObj.kismetFloors.includes(chestClaimInfo.floor)) {
-            const profit = bedrockChest.profit
-            if (profit < acPogObj.kismetMinProfit) {
-                tryingToKismet = true
-                indexToClick = bedrockChest.slot
-                waitingForChestToOpen = true
-                return
-            }
+    if (!hasAlwaysBuyItem && !chestClaimInfo.skipKismet && acPogObj.useKismets && bedrockChest !== null && acPogObj.kismetFloors.includes(chestClaimInfo.floor)) {
+        const profit = bedrockChest.profit
+        if (profit < acPogObj.kismetMinProfit) {
+            tryingToKismet = true
+            indexToClick = bedrockChest.slot
+            waitingForChestToOpen = true
+            return
         }
+    }
 
-        ChatLib.chat(`Claiming the ${chestData[0].chestColor}${chestData[0].chestName} Chest`)
+    ChatLib.chat(`Claiming the ${chestData[0].chestColor}${chestData[0].chestName} Chest`)
 
-        const chestsToClaim = [chestData[0]]
-        if (chestData[1].profit >= acPogObj.chestKeyMinProfit && acPogObj.useChestKeys) {
-            ChatLib.chat(`Using chest key on the ${chestData[1].chestColor}${chestData[1].chestName} Chest`)
-            chestClaimInfo.chestSlot = chestData[1].slot
-            chestsToClaim.push(chestData[1])
-        }
+    const chestsToClaim = [chestData[0]]
+    if (chestData[1].profit >= acPogObj.chestKeyMinProfit && acPogObj.useChestKeys) {
+        ChatLib.chat(`Using chest key on the ${chestData[1].chestColor}${chestData[1].chestName} Chest`)
+        chestClaimInfo.chestSlot = chestData[1].slot
+        chestsToClaim.push(chestData[1])
+    }
 
-        // Log the loot for this floor
-        const runIndex = chestClaimInfo.runSlot + (chestClaimInfo.page - 1) * 54
-        if (!loggedIndexes.includes(runIndex)) {
-            // ChatLib.chat(`Logged loot for page ${chestClaimInfo.page} run slot ${chestClaimInfo.runSlot}`)
-            loggedIndexes.push(runIndex)
-            logLoot(chestClaimInfo.floor, chestsToClaim, chestData.length)
-        }
+    // Log the loot for this floor
+    const runIndex = chestClaimInfo.runSlot + (chestClaimInfo.page - 1) * 54
+    if (!loggedIndexes.includes(runIndex)) {
+        // ChatLib.chat(`Logged loot for page ${chestClaimInfo.page} run slot ${chestClaimInfo.runSlot}`)
+        loggedIndexes.push(runIndex)
+        logLoot(chestClaimInfo.floor, chestsToClaim, chestData.length)
+    }
 
-        const toClick = chestData[0].slot
-        indexToClick = toClick
-        waitingForChestToOpen = true
-        failedIndexes.push(chestClaimInfo.runSlot + (chestClaimInfo.page - 1) * 54)
-    }   
+    const toClick = chestData[0].slot
+    indexToClick = toClick
+    waitingForChestToOpen = true
+    failedIndexes.push(chestClaimInfo.runSlot + (chestClaimInfo.page - 1) * 54)
 })
 
 register("tick", () => {
@@ -328,6 +363,8 @@ const reset = () => {
     waitingForRunToOpen = false
     waitingForChestToOpen = false
     lastPageOn = null
+    waitingOnPage = null
+
     indexToClick = null
     tryingToKismet = false
     canKismet = true
@@ -478,6 +515,7 @@ register("command", (...args) => {
 
     if (args[0] == "go") {
         const sinceUpdate = Date.now() - acPogObj.lastApiUpdate
+        logger.clear()
 
         // Updated recently enough
         if (sinceUpdate <= 1_800_000) {
@@ -485,9 +523,11 @@ register("command", (...args) => {
             return
         }
 
+        logger.push("Updating prices from API")
         ChatLib.chat(`&ePrices have not been updated in over 30 minutes. Grabbing data...`)
         
         updateApiData(() => {
+            logger.push("Successfully updated prices, starting to claim now")
             autoClaiming = true
         })
     }
@@ -555,6 +595,12 @@ register("command", (...args) => {
     if (args[0] == "noclick") {
         acPogObj.noClick = !acPogObj.noClick
         ChatLib.chat(`No Click is now set to ${formattedBool(acPogObj.noClick)}`)
+        return
+    }
+
+    if (args[0] == "copy") {
+        logger.copy()
+        ChatLib.chat(`&aCopied AutoCroesus log to clipboard. (${logger.str.length} chars)`)
         return
     }
 

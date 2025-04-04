@@ -1,5 +1,6 @@
 import Promise from "../../PromiseV2";
 import request from "../../requestV2";
+import logger from "./logger";
 
 export const worthless = new Set()
 export const alwaysBuy = new Set()
@@ -164,22 +165,26 @@ export const updatePrices = () => new Promise((resolve, reject) => {
         const binSuccess = handleBinResp(binResp)
 
         if (!bzSuccess[0]) {
+            logger.push(`Failed bzSuccess: ${JSON.stringify(bzSuccess[1])}`)
             reject(bzSuccess[1])
             return
         }
         
         if (!itemSuccesss[0]) {
+            logger.push(`Failed itemSuccesss: ${JSON.stringify(itemSuccesss[1])}`)
             reject(itemSuccesss[1])
             return
         }
 
         if (!binSuccess[0]) {
+            logger.push(`Failed binSuccess: ${JSON.stringify(binSuccess[1])}`)
             reject(binSuccess[1])
             return
         }
 
         resolve()
     }).catch(e => {
+        logger.push(`Failed to grab prices: ${JSON.stringify(e)}`)
         reject(e)
     })
 
@@ -189,6 +194,7 @@ export const updatePrices = () => new Promise((resolve, reject) => {
 export const getSellPrice = (sbID, useSellOrder=true) => {
     // Override to avoid price manipulation
     if (worthless.has(sbID)) {
+        logger.push(`  ${sbID} is WORTHLESS`)
         return 0
     }
 
@@ -204,6 +210,8 @@ export const getSellPrice = (sbID, useSellOrder=true) => {
     if (sbID in binData) {
         return binData[sbID]
     }
+
+    logger.push(`Could not find price for ${sbID} (${Object.keys(bzData).length} items in BZ, ${Object.keys(binData).length} items in BIN)`)
 
     return null
 }

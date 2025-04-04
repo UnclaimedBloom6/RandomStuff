@@ -1,4 +1,5 @@
 import PogObject from "../../PogData"
+import logger from "./logger"
 import { alwaysBuy, getItemApiData, getSellPrice, getSkyblockItems } from "./prices"
 
 
@@ -89,6 +90,7 @@ export const tryClickCroesus = () => {
     const croesusEntity = findCroesusEntity()
 
     if (!croesusEntity) {
+        logger.push("Could not find croesus entity")
         return false
     }
 
@@ -96,6 +98,7 @@ export const tryClickCroesus = () => {
 
     // Too far away
     if (distSq > REACH**2) {
+        logger.push("Croesus entity is too far away")
         return false
     }
 
@@ -163,14 +166,17 @@ export const findUnopenedChest = (inv, excludedIndexes=[], page, canKismet=true)
 
         // They are ordered, none can appear after here
         if (!item) {
+            logger.push(`Item in index ${i} is null`)
             return [null, null]
         }
 
         if (item.getRegistryName() !== "minecraft:skull") {
+            logger.push(`Index ${i} is not a skull`)
             continue
         }
 
         if (!item.getLore().includes("§5§o§8No Chests Opened!")) {
+            logger.push(`Index ${i} already looted`)
             continue
         }
 
@@ -178,6 +184,7 @@ export const findUnopenedChest = (inv, excludedIndexes=[], page, canKismet=true)
         let dungeonType = item.getName().removeFormatting()
         let floorMatch = item.getLore()[1].match(/^(?:§.)+Tier: §eFloor (\w+)$/)
         if (!floorMatch) {
+            logger.push(`Could not match floor: "${item.getLore()[1]}"`)
             excludedIndexes.push(extendedIndex)
             return [null, null]
         }
@@ -283,6 +290,7 @@ const tryParseLine = (line) => {
     const entry = itemInfo.find(a => a.name == itemUnformatted && !a.id.startsWith("STARRED_"))
 
     if (!entry) {
+        logger.push(`No item ID found for item "${line}"`)
         return [false, `Could not find item ID for line "${line}&r"`]
     }
 
@@ -298,10 +306,12 @@ export const parseRewards = (itemLines, costStr) => {
     }
 
     // Parse the chest cost
+    logger.push(`Chest Cost is "${costStr}"`)
     if (costStr !== "§5§o§aFREE") {
         const costMatch = costStr.match(/^§5§o§6([\d,]+) Coins$/)
         // If the cost can't be found, then it's safer to just not claim this chest and have the user do it manually
         if (!costMatch) {
+            logger.push("Could not match chest cost with regex")
             return [false, "Could not find chest cost"]
         }
 
@@ -310,10 +320,12 @@ export const parseRewards = (itemLines, costStr) => {
 
     // And now the items
     for (let line of itemLines) {
+        logger.push(`Trying to parse line "${line}"`)
         let result = tryParseLine(line)
 
         // Could not parse this line. Return the entire line to print back to the user for debugging
         if (!result) {
+            logger.push(`Failed to parse`)
             return [false, `Could not parse line: "${line}&r"`]
         }
 
@@ -321,6 +333,7 @@ export const parseRewards = (itemLines, costStr) => {
         let itemValue = getSellPrice(sbID, true)
 
         if (itemValue === null) {
+            logger.push(`Item value of ${sbID} was null`)
             return [false, `Could not find value of ${sbID}`]
         }
 
