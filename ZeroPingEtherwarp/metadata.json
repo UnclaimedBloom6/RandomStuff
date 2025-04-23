@@ -1,10 +1,9 @@
 {
     "name": "ZeroPingEtherwarp",
     "creator": "UnclaimedBloom6",
-    "version": "0.0.2",
+    "version": "0.1.0",
     "entry": "index.js",
     "requires": [
-        "BloomCore",
         "PogData"
     ]
 }

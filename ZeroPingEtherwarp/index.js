@@ -1,11 +1,18 @@
-import { getEtherwarpBlock, getLastSentLook, getSkyblockItemID } from "../BloomCore/utils/Utils"
 import PogObject from "../PogData"
-
-const S08PacketPlayerPosLook = Java.type("net.minecraft.network.play.server.S08PacketPlayerPosLook")
-const C06PacketPlayerPosLook = Java.type("net.minecraft.network.play.client.C03PacketPlayer$C06PacketPlayerPosLook")
-const C0BPacketEntityAction = Java.type("net.minecraft.network.play.client.C0BPacketEntityAction")
-
-const C08PacketPlayerBlockPlacement = Java.type("net.minecraft.network.play.client.C08PacketPlayerBlockPlacement")
+import {
+    C06PacketPlayerPosLook,
+    C08PacketPlayerBlockPlacement,
+    C0BPacketEntityAction,
+    getLastSentCoord,
+    getLastSentLook,
+    getSkyblockItemID,
+    getTunerBonusDistance,
+    isEtherwarpItem,
+    S08PacketPlayerPosLook,
+    simEtherwarp,
+    SNEAKING_EYE_HEIGHT,
+    STANDING_EYE_HEIGHT
+} from "./utils"
 
 const dataObject = new PogObject("ZeroPingEtherwarp", {
     firstTime: true,
@@ -103,40 +110,60 @@ const checkAllowedFails = () => {
     if (recentlySentC06s.length >= MAXQUEUEDPACKETS) return false
     
     // Filter old fails
-    while (recentFails.length && Date.now() - recentFails[0] > FAILWATCHPERIOD * 1000) recentFails.shift()
+    while (recentFails.length > 0 && Date.now() - recentFails[0] > FAILWATCHPERIOD * 1000) {
+        recentFails.shift()
+    }
 
     return recentFails.length < MAXFAILSPERFAILPERIOD
 }
 
-const validEtherwarpItems = new Set([
-    "ASPECT_OF_THE_END",
-    "ASPECT_OF_THE_VOID",
-    "ETHERWARP_CONDUIT",
-])
-
-const isHoldingEtherwarpItem = () => {
-    const held = Player.getHeldItem()
-    const sbId = getSkyblockItemID(held)
-
-    if (!validEtherwarpItems.has(sbId)) return false
+// Have to do this since scheduleTask sometimes doesn't fucking run, so we've gotta send it at the start of the next tick.
+let c06ToSend = null
+const c06Sender = register("tick", () => {
+    c06Sender.unregister()
     
-    // Etherwarp conduit doesn't have the ethermerge NBT tag, the ability is there by default
-    return held.getNBT()?.toObject()?.tag?.ExtraAttributes?.ethermerge == 1 || sbId == "ETHERWARP_CONDUIT"
-}
+    // Should never happen but best to be careful
+    if (!c06ToSend) {
+        return
+    }
 
-const getTunerBonusDistance = () => {
-    return Player.getHeldItem()?.getNBT()?.toObject()?.tag?.ExtraAttributes?.tuned_transmission || 0
-}
+    const { x, y, z, pitch, yaw } = c06ToSend
 
-const doZeroPingEtherwarp = () => {
-    const rt = getEtherwarpBlock(true, 57 + getTunerBonusDistance() - 1)
-    if (!rt) return
+    Player.getPlayer().func_70107_b(x, y, z)
+    Client.sendPacket(new C06PacketPlayerPosLook(x, y, z, yaw, pitch, Player.asPlayerMP().isOnGround()))
 
-    let [pitch, yaw] = getLastSentLook()
+    if (!dataObject.keepMotion) {
+        Player.getPlayer().func_70016_h(0, 0, 0) //.setVelocity()
+    }
+
+    c06Sender.unregister()
+}).unregister()
+
+const doZeroPingEtherwarp = (x0, y0, z0, pitch, yaw) => {
+    const distance = 57 + getTunerBonusDistance() - 1
+
     yaw %= 360
-    if (yaw < 0) yaw += 360
+    if (yaw < 0) {
+        yaw += 360
+    }
 
-    let [x, y, z] = rt
+    const f = Math.cos(-yaw * 0.017453292 - Math.PI)
+    const f1 = Math.sin(-yaw * 0.017453292 - Math.PI)
+    const f2 = -Math.cos(-pitch * 0.017453292)
+    const f3 = Math.sin(-pitch * 0.017453292)
+
+    const dx = f1 * f2 * distance
+    const dy = f3 * distance
+    const dz = f * f2 * distance
+
+    const eyePos = y0 + (isSneaking ? SNEAKING_EYE_HEIGHT : STANDING_EYE_HEIGHT)
+    const etherSpot = simEtherwarp(x0, eyePos, z0, x0+dx, eyePos+dy, z0+dz)
+
+    if (!etherSpot) {
+        return
+    }
+
+    let [x, y, z] = etherSpot
 
     x += 0.5
     y += 1.05
@@ -147,15 +174,8 @@ const doZeroPingEtherwarp = () => {
     // The danger zone
     // At the end of this tick, send the C06 packet which would normally be sent after the server teleports you
     // and then set the player's position to the destination. The C06 being sent is what makes this true zero ping.
-    Client.scheduleTask(0, () => {
-
-        Client.sendPacket(new C06PacketPlayerPosLook(x, y, z, yaw, pitch, Player.asPlayerMP().isOnGround()))
-        // Player.getPlayer().setPosition(x, y, z)
-        Player.getPlayer().func_70107_b(x, y, z)
-
-        // .setVelocity()
-        if (!dataObject.keepMotion) Player.getPlayer().func_70016_h(0, 0, 0)
-    })
+    c06ToSend = { x, y, z, pitch, yaw }
+    c06Sender.register()
 }
 
 // Don't teleport when looking at these blocks
@@ -173,15 +193,36 @@ register("packetSent", (packet) => {
     if (dir !== 255) return
 
     const held = Player.getHeldItem()
-    const item = getSkyblockItemID(held)
-    const blockID = Player.lookingAt()?.getType()?.getID()
-    if (!isHoldingEtherwarpItem() || !getLastSentLook() || !isSneaking && item !== "ETHERWARP_CONDUIT" || blacklistedIds.includes(blockID)) return
+    const sbId = getSkyblockItemID(held)
+
+    // Not holding etherwarp item or looking at chest
+    if (!isEtherwarpItem(held, sbId) || blacklistedIds.includes(Player.lookingAt()?.getType()?.getID())) {
+        return
+    }
+
+    // Enable zero ping for etherwarp conduit
+    if (!isSneaking && sbId !== "ETHERWARP_CONDUIT") {
+        return
+    }
+
+    const lastLook = getLastSentLook()
+    const lastStand = getLastSentCoord()
+
+    // Always sync with the server
+    if (!lastLook || !lastStand) {
+        return
+    }
+    
+    // Failsafe
     if (!checkAllowedFails()) {
         ChatLib.chat(`&cZero ping etherwarp teleport aborted.\n&c${recentFails.length} fails last ${FAILWATCHPERIOD}s\n&c${recentlySentC06s.length} C06's queued currently`)
         return
     }
 
-    doZeroPingEtherwarp()
+    const [x0, y0, z0] = lastStand
+    const [pitch, yaw] = lastLook
+
+    doZeroPingEtherwarp(x0, y0, z0, pitch, yaw)
 }).setFilteredClass(C08PacketPlayerBlockPlacement)
 
 // For whatever rounding errors etc occur
@@ -189,7 +230,7 @@ const isWithinTolerence = (n1, n2) => Math.abs(n1 - n2) < 1e-4
 
 // Listening for server teleport packets
 register("packetReceived", (packet, event) => {
-    if (!dataObject.enabled || !recentlySentC06s.length) return
+    if (!dataObject.enabled || recentlySentC06s.length == 0) return
 
     const { pitch, yaw, x, y, z, sentAt } = recentlySentC06s.shift()
 
@@ -211,13 +252,17 @@ register("packetReceived", (packet, event) => {
     const wasPredictionCorrect = Object.values(lastPresetPacketComparison).every(a => a == true)
 
     // The etherwarp was predicted correctly, cancel the packet since we've already sent the response back when we tried to teleport
-    if (wasPredictionCorrect) return cancel(event)
+    if (wasPredictionCorrect) {
+        cancel(event)
+        return
+    }
 
     // The etherwarp was not predicted correctly
     recentFails.push(Date.now())
     
     // Discard the rest of the queued teleports to check since one earlier in the chain failed
-    while (recentlySentC06s.length) recentlySentC06s.shift()
+    while (recentlySentC06s.length > 0) {
+        recentlySentC06s.pop()
+    }
 
 }).setFilteredClass(S08PacketPlayerPosLook)
-
