@@ -221,3 +221,12 @@ register("packetSent", (packet) => {
         lastSentLook = getPacketLook(packet)
     }
 }).setFilteredClass(C03PacketPlayer)
+
+register("worldUnload", () => {
+    lastSentLook = null
+    lastSentCoords = null
+})
+register("worldLoad", () => {
+    lastSentLook = null
+    lastSentCoords = null
+})
