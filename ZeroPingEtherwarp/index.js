@@ -17,7 +17,7 @@ import {
 const dataObject = new PogObject("ZeroPingEtherwarp", {
     firstTime: true,
     enabled: false,
-    keepMotion: true,
+    keepMotion: false,
 }, "data.json")
 
 const firstInstallTrigger = register("tick", () => {

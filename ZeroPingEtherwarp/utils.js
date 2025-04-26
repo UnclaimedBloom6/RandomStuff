@@ -83,6 +83,14 @@ const etherBlockTypes = [
 // Each index corresponds to a block ID, where that index can either be true or false depending on if this is a valid ether foot block
 const validEtherwarpFeetBlocks = new Array(500).fill(false).map((_, i) => etherBlockTypes.includes(i))
 
+const isValidEtherwarpFootBlock = (blockID) => {
+    if (blockID == null || blockID < 0 || blockID >= validEtherwarpFeetBlocks.length) {
+        return false
+    }
+
+    return validEtherwarpFeetBlocks[blockID]
+}
+
 export const simEtherwarp = (x0, y0, z0, x1, y1, z1) => {
     // Initialize Shit
     let x = Math.floor(x0)
@@ -122,15 +130,15 @@ export const simEtherwarp = (x0, y0, z0, x1, y1, z1) => {
         // End Reached
         if (currentBlock.type.getID() !== 0) {
             // Cannot stand ontop
-            if (validEtherwarpFeetBlocks[currentBlock.type.getID()]) return null
+            if (isValidEtherwarpFootBlock(currentBlock.type.getID())) return null
 
             // Block the player's feet will be in after etherwarping
             let footBlock = World.getBlockAt(x, y+1, z)
-            if (!validEtherwarpFeetBlocks[footBlock.type.getID()]) return null
+            if (!isValidEtherwarpFootBlock(footBlock.type.getID())) return null
 
             // Head block after etherwarp
             let headBlock = World.getBlockAt(x, y+2, z)
-            if (!validEtherwarpFeetBlocks[headBlock.type.getID()]) return null
+            if (!isValidEtherwarpFootBlock(headBlock.type.getID())) return null
 
             return [x, y, z]
         }
