@@ -15,6 +15,8 @@ export const printHelp = () => {
             .setHover("show_text", "Toggle the overlay for the run loot and unclaimed chests (Will still show without auto looting on)."),
         new TextComponent(`&a//ac delay <ms>\n`)
             .setHover("show_text", "Throttle how quickly the module will be allowed to click (Values lower than your ping will not make a difference)."),
+        new TextComponent(`&a//ac loot help|floor:[floor] limit:[limit] score:[minscore]\n`)
+            .setHover("show_text", "Shows all of the loot collected from using the module, with optional params to filter the loot based on floor, score or limit the number of runs to show."),
         "\n",
         new TextComponent(`&a//ac kismet\n`)
             .setHover("show_text", "Toggle rerolling."),
