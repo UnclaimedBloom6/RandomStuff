@@ -129,10 +129,21 @@ const c06Sender = register("tick", () => {
 
     const { x, y, z, pitch, yaw } = c06ToSend
 
+    let keepMotion = dataObject.keepMotion
+    const blockInside = World.getBlockAt(Math.floor(x), Math.floor(y), Math.floor(z))
+    const blockUnder = World.getBlockAt(Math.floor(x), Math.floor(y) - 1, Math.floor(z))
+
+    if (blockUnder.type.getRegistryName() == "minecraft:hopper") {
+        keepMotion = false
+    }
+    if (blockInside.type.getRegistryName() == "minecraft:skull") {
+        keepMotion = false
+    }
+
     Player.getPlayer().func_70107_b(x, y, z)
     Client.sendPacket(new C06PacketPlayerPosLook(x, y, z, yaw, pitch, Player.asPlayerMP().isOnGround()))
 
-    if (!dataObject.keepMotion) {
+    if (!keepMotion) {
         Player.getPlayer().func_70016_h(0, 0, 0) //.setVelocity()
     }
 
