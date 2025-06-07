@@ -246,7 +246,7 @@ export const addWorthlessItem = (itemId) => {
     const upper = itemId.toUpperCase()
     if (worthless.has(upper)) {
         worthless.delete(upper)
-        ChatLib.chat(`&cRemoved &f${upper} &cfrom Always Buy list!`)
+        ChatLib.chat(`&cRemoved &f${upper} &cfrom Worthless list!`)
         writeWorthless()
         return
     }
