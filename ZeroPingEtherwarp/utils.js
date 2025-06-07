@@ -76,7 +76,10 @@ const etherBlockTypes = [
     "minecraft:brown_mushroom",
     "minecraft:red_mushroom",
     "minecraft:piston_extension",
-    "minecraft:portal"
+    "minecraft:portal",
+    "minecraft:reeds",
+    "minecraft:flowing_lava",
+    "minecraft:cocoa",
 ].map(a => new BlockType(a).getID())
 
 // Make it so that the array can be directly indexed into via the block id instead of having to calculate a hash with a set

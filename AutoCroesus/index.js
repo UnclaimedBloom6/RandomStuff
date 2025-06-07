@@ -392,6 +392,7 @@ const updateApiData = (onDone=null) => {
             onDone()
         }
     }).catch((reason) => {
+        logger.write()
         ChatLib.chat(`&cFailed to grab data from API: ${reason}`)
         ChatLib.chat(`&cTo try again, run //ac api`)
         ChatLib.chat(`&eIf this keeps happening, contact UnclaimedBloom6 on Discord.`)
