@@ -533,6 +533,12 @@ register("command", (...args) => {
         })
     }
 
+    if (args[0] == "forcego") {
+        ChatLib.chat(`&aClaiming without updating API.`)
+        autoClaiming = true
+        return
+    }
+
     if (args[0] == "api") {
         ChatLib.chat(`&aGrabbing data...`)
         updateApiData()

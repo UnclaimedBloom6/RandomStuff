@@ -7,6 +7,8 @@ export const printHelp = () => {
             .setHover("show_text", "Shows this message."),
         new TextComponent(`&a//ac go\n`)
             .setHover("show_text", "Start looting Croesus."),
+        new TextComponent(`&a//ac forcego\n`)
+            .setHover("show_text", "Start looting Croesus without checking when the last time prices were updated was."),
         new TextComponent(`&a//ac api\n`)
             .setHover("show_text", "Refresh API."),
         new TextComponent(`&a//ac settings\n`)
