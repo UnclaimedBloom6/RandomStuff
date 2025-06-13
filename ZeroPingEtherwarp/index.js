@@ -3,6 +3,7 @@ import {
     C06PacketPlayerPosLook,
     C08PacketPlayerBlockPlacement,
     C0BPacketEntityAction,
+    eyeHeights,
     getLastSentCoord,
     getLastSentLook,
     getSkyblockItemID,
@@ -10,19 +11,22 @@ import {
     isEtherwarpItem,
     S08PacketPlayerPosLook,
     simEtherwarp,
-    SNEAKING_EYE_HEIGHT,
-    STANDING_EYE_HEIGHT
 } from "./utils"
 
 const dataObject = new PogObject("ZeroPingEtherwarp", {
     firstTime: true,
     enabled: false,
     keepMotion: false,
+    eyeHeight: eyeHeights.normal,
+    debug: false,
 }, "data.json")
 
 const firstInstallTrigger = register("tick", () => {
     firstInstallTrigger.unregister()
-    if (!dataObject.firstTime) return
+
+    if (!dataObject.firstTime) {
+        return
+    }
 
     dataObject.firstTime = false
     dataObject.save()
@@ -58,7 +62,8 @@ register("command", (arg1, arg2) => {
         const message = [
             "&b/zpew - &3Shows this message",
             "&b/zpew toggle - &3Toggle the module",
-            "&b/zpew keepmotion - &3Preserves momentum after teleporting"
+            "&b/zpew keepmotion - &3Preserves momentum after teleporting",
+            `&b/zpew eyepos <${Object.keys(eyeHeights).join(", ")}> - &3Change the height above your feet that the etherwarp prediction raycast will start.`
         ].join("\n")
         ChatLib.chat(message)
         return
@@ -77,7 +82,46 @@ register("command", (arg1, arg2) => {
         ChatLib.chat(`&aKeep Motion ${dataObject.keepMotion ? "&aEnabled" : "&cDisabled"}&a.`)
         return
     }
-}).setName("zeropingetherwarp").setAliases(["zpew"]).setTabCompletions(["toggle", "keepmotion"])
+    if (arg1 == "eyepos") {
+        if (!arg2) {
+            ChatLib.chat(`Current eye height: ${dataObject.eyeHeight}`)
+            return
+        }
+
+        if (!(arg2 in eyeHeights)) {
+            ChatLib.chat(`Possible eye heights: ${Object.keys(eyeHeights).join(", ")}`)
+            return
+        }
+
+        dataObject.eyeHeight = eyeHeights[arg2]
+        dataObject.save()
+        ChatLib.chat(`Eye height changed to ${arg2} (${eyeHeights[arg2]} blocks)`)
+        return
+    }
+
+    if (arg1 == "debug") {
+        dataObject.debug = !dataObject.debug
+        dataObject.save()
+        ChatLib.chat(`ZeroPingEtherwarp Debug mode ${dataObject.debug ? "&aEnabled" : "&cDisabled"}&r.`)
+        return
+    }
+}).setTabCompletions(args => {
+    const firstArgs = ["toggle", "keepmotion", "eyepos"]
+
+    if (args.length == 0) {
+        return firstArgs
+    }
+
+    if (args[0] == "eyepos") {
+        if (args.length == 1) {
+            return Object.keys(eyeHeights)
+        }
+
+        return Object.keys(eyeHeights).filter(a => a.startsWith(args[1].toLowerCase()))
+    }
+
+    return firstArgs.filter(a => a.startsWith(args[0].toLowerCase()))
+}).setName("zeropingetherwarp").setAliases(["zpew"])
 
 const FAILWATCHPERIOD = 20 // 20 Seconds
 const MAXFAILSPERFAILPERIOD = 3 // 3 fails allowed per 20 seconds. Higher numbers of fails could cause timer bans
@@ -146,8 +190,6 @@ const c06Sender = register("tick", () => {
     if (!keepMotion) {
         Player.getPlayer().func_70016_h(0, 0, 0) //.setVelocity()
     }
-
-    c06Sender.unregister()
 }).unregister()
 
 const doZeroPingEtherwarp = (x0, y0, z0, pitch, yaw) => {
@@ -167,7 +209,7 @@ const doZeroPingEtherwarp = (x0, y0, z0, pitch, yaw) => {
     const dy = f3 * distance
     const dz = f * f2 * distance
 
-    const eyePos = y0 + (isSneaking ? SNEAKING_EYE_HEIGHT : STANDING_EYE_HEIGHT)
+    const eyePos = y0 + (isSneaking ? dataObject.eyeHeight : eyeHeights.standing)
     const etherSpot = simEtherwarp(x0, eyePos, z0, x0+dx, eyePos+dy, z0+dz)
 
     if (!etherSpot) {
@@ -181,6 +223,10 @@ const doZeroPingEtherwarp = (x0, y0, z0, pitch, yaw) => {
     z += 0.5
 
     recentlySentC06s.push({ pitch, yaw, x, y, z, sentAt: Date.now() })
+
+    if (dataObject.debug) {
+        return
+    }
 
     // The danger zone
     // At the end of this tick, send the C06 packet which would normally be sent after the server teleports you
@@ -261,6 +307,20 @@ register("packetReceived", (packet, event) => {
     }
 
     const wasPredictionCorrect = Object.values(lastPresetPacketComparison).every(a => a == true)
+
+    if (dataObject.debug) {
+        const msg = [
+            `${wasPredictionCorrect ? "&a" : "&c"}Last Etherwarp:`,
+            `${lastPresetPacketComparison.pitch ? "&a" : "&c"}Pitch ${pitch} -> ${newPitch}`,
+            `${lastPresetPacketComparison.yaw ? "&a" : "&c"}Yaw ${yaw} -> ${newYaw}`,
+            `${lastPresetPacketComparison.x ? "&a" : "&c"}X ${x} -> ${newX}`,
+            `${lastPresetPacketComparison.y ? "&a" : "&c"}Y ${y} -> ${newY}`,
+            `${lastPresetPacketComparison.z ? "&a" : "&c"}Z ${y} -> ${newZ}`,
+        ].join("\n")
+
+        ChatLib.chat(msg)
+        return
+    }
 
     // The etherwarp was predicted correctly, cancel the packet since we've already sent the response back when we tried to teleport
     if (wasPredictionCorrect) {

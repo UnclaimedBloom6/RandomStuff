@@ -8,8 +8,11 @@ export const S08PacketPlayerPosLook = Java.type("net.minecraft.network.play.serv
 export const C0BPacketEntityAction = Java.type("net.minecraft.network.play.client.C0BPacketEntityAction")
 export const C08PacketPlayerBlockPlacement = Java.type("net.minecraft.network.play.client.C08PacketPlayerBlockPlacement")
 
-export const SNEAKING_EYE_HEIGHT = 1.54
-export const STANDING_EYE_HEIGHT = 1.62
+export const eyeHeights = {
+    normal: 1.54,
+    standing: 1.62,
+    modern: 1.27,
+}
 
 const validEtherwarpItems = [
     "ASPECT_OF_THE_END",
