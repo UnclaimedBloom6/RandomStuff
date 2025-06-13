@@ -73,7 +73,9 @@ const findCroesusEntity = () => {
         const distY = (displayStand.getY() - a.getY())
         const distZ = (displayStand.getZ() - a.getZ())
 
-        return a.getUUID().version() == 2 && distX == 0.03125 && distY == 0 && distZ == 0
+        // ChatLib.chat(`distx=${distX} disty=${distY} distz=${distZ}`)
+
+        return a.getUUID().version() == 2 && distX == 0 && distY == 0 && distZ == 0
     })
 
     if (!players.length) return null
