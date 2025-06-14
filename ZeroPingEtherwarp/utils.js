@@ -71,7 +71,6 @@ const etherBlockTypes = [
     "minecraft:unpowered_comparator",
     "minecraft:powered_comparator",
     "minecraft:web",
-    "minecraft:waterlily",
     "minecraft:water",
     "minecraft:lava",
     "minecraft:torch",
