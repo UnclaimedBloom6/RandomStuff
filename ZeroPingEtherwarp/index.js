@@ -19,6 +19,7 @@ const dataObject = new PogObject("ZeroPingEtherwarp", {
     keepMotion: false,
     eyeHeight: eyeHeights.normal,
     debug: false,
+    debugFails: false,
 }, "data.json")
 
 const firstInstallTrigger = register("tick", () => {
@@ -100,9 +101,21 @@ register("command", (arg1, arg2) => {
     }
 
     if (arg1 == "debug") {
-        dataObject.debug = !dataObject.debug
-        dataObject.save()
-        ChatLib.chat(`ZeroPingEtherwarp Debug mode ${dataObject.debug ? "&aEnabled" : "&cDisabled"}&r.`)
+        if (!arg2) {
+            dataObject.debug = !dataObject.debug
+            dataObject.save()
+            ChatLib.chat(`ZeroPingEtherwarp Debug mode ${dataObject.debug ? "&aEnabled" : "&cDisabled"}&r.`)
+            return
+        }
+        
+        if (arg2 == "fails") {
+            dataObject.debugFails = !dataObject.debugFails
+            dataObject.save()
+            ChatLib.chat(`Debug Fails Only ${dataObject.debugFails ? "&aEnabled" : "&cDisabled"}&r.`)
+            return
+        }
+
+        ChatLib.chat(`Unknown arg`)
         return
     }
 }).setTabCompletions(args => {
@@ -118,6 +131,10 @@ register("command", (arg1, arg2) => {
         }
 
         return Object.keys(eyeHeights).filter(a => a.startsWith(args[1].toLowerCase()))
+    }
+
+    if (args[0] == "debug") {
+        return ["fails"]
     }
 
     return firstArgs.filter(a => a.startsWith(args[0].toLowerCase()))
@@ -308,7 +325,7 @@ register("packetReceived", (packet, event) => {
 
     const wasPredictionCorrect = Object.values(lastPresetPacketComparison).every(a => a == true)
 
-    if (dataObject.debug) {
+    if (dataObject.debug || !wasPredictionCorrect && dataObject.debugFails) {
         const msg = [
             `${wasPredictionCorrect ? "&a" : "&c"}Last Etherwarp:`,
             `${lastPresetPacketComparison.pitch ? "&a" : "&c"}Pitch ${pitch} -> ${newPitch}`,
@@ -319,6 +336,9 @@ register("packetReceived", (packet, event) => {
         ].join("\n")
 
         ChatLib.chat(msg)
+    }
+
+    if (dataObject.debug) {
         return
     }
 
