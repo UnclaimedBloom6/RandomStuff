@@ -47,6 +47,14 @@ export const tierColors = {
     "SUPREME": "&4",
 }
 
+export const itemReplacements = {
+    "Shiny Wither Boots": "WITHER_BOOTS",
+    "Shiny Wither Leggings": "WITHER_LEGGINGS",
+    "Shiny Wither Chestplate": "WITHER_CHESTPLATE",
+    "Shiny Wither Helmet": "WITHER_HELMET",
+    "Shiny Necron's Handle": "NECRON_HANDLE",
+}
+
 export const tryClickEntity = (entity) => {
     let finalEntity = entity
     if (entity instanceof Entity) {
@@ -287,6 +295,10 @@ const tryParseLine = (line) => {
     }
 
     const itemUnformatted = line.removeFormatting().trim()
+
+    if (itemUnformatted in itemReplacements) {
+        return [itemReplacements[itemUnformatted], 1]
+    }
 
     const itemInfo = getSkyblockItems()
     const entry = itemInfo.find(a => a.name == itemUnformatted && !a.id.startsWith("STARRED_"))
