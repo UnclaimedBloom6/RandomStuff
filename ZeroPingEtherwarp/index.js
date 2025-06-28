@@ -332,7 +332,7 @@ register("packetReceived", (packet, event) => {
             `${lastPresetPacketComparison.yaw ? "&a" : "&c"}Yaw ${yaw} -> ${newYaw}`,
             `${lastPresetPacketComparison.x ? "&a" : "&c"}X ${x} -> ${newX}`,
             `${lastPresetPacketComparison.y ? "&a" : "&c"}Y ${y} -> ${newY}`,
-            `${lastPresetPacketComparison.z ? "&a" : "&c"}Z ${y} -> ${newZ}`,
+            `${lastPresetPacketComparison.z ? "&a" : "&c"}Z ${z} -> ${newZ}`,
         ].join("\n")
 
         ChatLib.chat(msg)

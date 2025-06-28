@@ -53,6 +53,7 @@ export const itemReplacements = {
     "Shiny Wither Chestplate": "WITHER_CHESTPLATE",
     "Shiny Wither Helmet": "WITHER_HELMET",
     "Shiny Necron's Handle": "NECRON_HANDLE",
+    "Wither": "SHARD_WITHER",
 }
 
 export const tryClickEntity = (entity) => {
