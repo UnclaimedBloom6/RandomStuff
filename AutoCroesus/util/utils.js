@@ -55,6 +55,7 @@ export const itemReplacements = {
     "Shiny Necron's Handle": "NECRON_HANDLE",
     "Wither": "SHARD_WITHER",
     "Apex Dragon": "SHARD_APEX_DRAGON",
+    "Power Dragon": "SHARD_POWER_DRAGON",
 }
 
 export const tryClickEntity = (entity) => {
