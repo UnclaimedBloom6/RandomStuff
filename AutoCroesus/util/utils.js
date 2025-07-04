@@ -47,6 +47,8 @@ export const tierColors = {
     "SUPREME": "&4",
 }
 
+// These items are not in the Skyblock items API endpoint, and thus can't have their item
+// names automatically be mapped to item IDs.
 export const itemReplacements = {
     "Shiny Wither Boots": "WITHER_BOOTS",
     "Shiny Wither Leggings": "WITHER_LEGGINGS",
@@ -54,8 +56,11 @@ export const itemReplacements = {
     "Shiny Wither Helmet": "WITHER_HELMET",
     "Shiny Necron's Handle": "NECRON_HANDLE",
     "Wither": "SHARD_WITHER",
+    "Thorn": "SHARD_THORN",
     "Apex Dragon": "SHARD_APEX_DRAGON",
     "Power Dragon": "SHARD_POWER_DRAGON",
+    "Necron Dye": "DYE_NECRON",
+    "Livid Dye": "DYE_LIVID",
 }
 
 export const tryClickEntity = (entity) => {
