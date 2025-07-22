@@ -36,7 +36,7 @@ export const getTunerBonusDistance = () => {
 
 // If one of these blocks is above the targeted etherwarp block, it is a valid teleport.
 // However if the block itself is being targetted, then it is not a valid block to etherwarp to.
-const etherBlockTypes = [
+const etherBlockIds = [
     "minecraft:air",
     "minecraft:fire",
     "minecraft:carpet",
@@ -86,7 +86,7 @@ const etherBlockTypes = [
 
 // Make it so that the array can be directly indexed into via the block id instead of having to calculate a hash with a set
 // Each index corresponds to a block ID, where that index can either be true or false depending on if this is a valid ether foot block
-const validEtherwarpFeetBlocks = new Array(500).fill(false).map((_, i) => etherBlockTypes.includes(i))
+const validEtherwarpFeetBlocks = new Array(500).fill(false).map((_, i) => etherBlockIds.includes(i))
 
 const isValidEtherwarpFootBlock = (blockID) => {
     if (blockID == null || blockID < 0 || blockID >= validEtherwarpFeetBlocks.length) {
@@ -131,9 +131,10 @@ export const simEtherwarp = (x0, y0, z0, x1, y1, z1) => {
 
         // Do block check function stuff
         let currentBlock = World.getBlockAt(x, y, z)
+        let currentId = currentBlock.type.getID()
         
-        // End Reached
-        if (currentBlock.type.getID() !== 0) {
+        // End Reached, solid block found
+        if (!validEtherwarpFeetBlocks[currentId]) {
             // Cannot stand ontop
             if (isValidEtherwarpFootBlock(currentBlock.type.getID())) return null
 
