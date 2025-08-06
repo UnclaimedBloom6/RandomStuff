@@ -356,7 +356,7 @@ export const parseRewards = (itemLines, costStr) => {
 
         if (itemValue === null) {
             logger.push(`Item value of ${sbID} was null`)
-            return [false, `Could not find value of ${sbID}`]
+            return [false, `Could not find value of \"${line}\"`]
         }
 
         chestInfo.value += itemValue * qty
