@@ -263,7 +263,7 @@ export const decodeNumeral = (numeral) => {
 }
 
 const tryParseBook = (line) => {
-    const match = line.match(/^§5§o§aEnchanted Book \((§d§l)?([\w ]+) (\w+)§a\)$/) // https://regex101.com/r/EQNCR9/2
+    const match = line.match(/^(?:§.)*Enchanted Book \((§d§l)?([\w ]+) (\w+)(?:§.)*\)$/) // https://regex101.com/r/zr3NwH/1
     if (!match) return null
 
     const [_, ultFormatting, bookName, tierStr] = match
