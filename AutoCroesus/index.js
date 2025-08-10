@@ -87,7 +87,18 @@ register("tick", () => {
 
 // Logic for inside of the main Croesus menu
 register("tick", () => {
-    if (!inCroesus() || !autoClaiming || waitingForRunToOpen) return
+    if (!inCroesus()) {
+        slotRenderer.unregister()
+        return
+    }
+
+    if (acPogObj.showChestInfo || acPogObj.noClick) {
+        slotRenderer.register()
+    }
+
+    if (!autoClaiming || waitingForRunToOpen) {
+        return
+    }
 
     waitingForCroesus = false
     // Don't reset for chest keys
@@ -642,7 +653,7 @@ register("postGuiRender", () => {
     Renderer.finishDraw()
 })
 
-register("renderSlot", (slot) => {
+const slotRenderer = register("renderSlot", (slot) => {
     if (acPogObj.noClick && slot.getIndex() < 54 && autoClaiming) {
         const x = slot.getDisplayX()
         const y = slot.getDisplayY()
@@ -656,9 +667,6 @@ register("renderSlot", (slot) => {
         Renderer.finishDraw()
     }
 
-    // Chest slot highlight
-    if (!inCroesus() || !acPogObj.showChestInfo) return
-
     const item = slot.getItem()
     if (!item || !item.getLore().includes("§5§o§8No Chests Opened!")) {
         return
@@ -668,7 +676,7 @@ register("renderSlot", (slot) => {
     const y = slot.getDisplayY()
 
     Renderer.drawRect(Renderer.color(0, 255, 0, 175), x, y, 16, 16)
-})
+}).unregister()
 
 
 const killSwitchKeys = [
