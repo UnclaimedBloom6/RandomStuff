@@ -201,7 +201,7 @@ register("tick", () => {
     const chestData = []
 
     // Find the chest items and parse the loot shown in their tooltips
-    for (let i = 9; i < 18; i++) { // stop pointless iterating over slots we know aren't chests
+    for (let i = 9; i < 18; i++) { // stop iterating over slots we know aren't chests
         let item = items[i]
 
         if (!item) continue
