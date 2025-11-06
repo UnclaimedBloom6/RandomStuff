@@ -136,7 +136,7 @@ export const inCroesus = () => {
 
 export const inRunGui = () => {
     const inv = Player.getContainer()
-    return inv.getName() == "Master Mode The Catacombs - Flo" || /^The Catacombs - Floor [IV]+$/.test(inv.getName())
+    return /^(?:Master )?Catacombs - ([FloorVI\d ]*)$/.test(inv.getName())
 }
 
 export const getCurrPage = () => {
