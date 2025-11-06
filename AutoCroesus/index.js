@@ -668,7 +668,7 @@ const slotRenderer = register("renderSlot", (slot) => {
     }
 
     const item = slot.getItem()
-    if (!item || !item.getLore().includes("§5§o§8No Chests Opened!")) {
+    if (!item || !item.getLore().includes("§5§o§cNo chests opened yet!")) {
         return
     }
 
