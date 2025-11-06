@@ -30,7 +30,7 @@ acPogObj.autosave()
 
 export const numerals = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
 const REACH = 4
-export const CHEST_REGEX = /^(§.)(\w+) Chest$/
+export const CHEST_REGEX = /^(§.)(Wood|Gold|Diamond|Emerald|Obsidian|Bedrock)$/
 
 export const formattedBool = (bool) => bool ? "&atrue" : "&cfalse"
 export const formatNumber = (num) => num?.toString()?.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
@@ -193,14 +193,14 @@ export const findUnopenedChest = (inv, excludedIndexes=[], page, canKismet=true)
             continue
         }
 
-        if (!item.getLore().includes("§5§o§8No Chests Opened!")) {
+        if (!item.getLore().includes("§5§o§cNo chests opened yet!")) {
             logger.push(`Index ${i} already looted`)
             continue
         }
 
         // Find the floor
         let dungeonType = item.getName().removeFormatting()
-        let floorMatch = item.getLore()[1].match(/^(?:§.)+Tier: §eFloor (\w+)$/)
+        let floorMatch = item.getLore()[1].match(/^(?:§.)+§eFloor (\w+)$/)
         if (!floorMatch) {
             logger.push(`Could not match floor: "${item.getLore()[1]}"`)
             excludedIndexes.push(extendedIndex)
