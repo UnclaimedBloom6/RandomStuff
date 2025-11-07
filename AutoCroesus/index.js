@@ -201,7 +201,7 @@ register("tick", () => {
     const chestData = []
 
     // Find the chest items and parse the loot shown in their tooltips
-    for (let i = 9; i < 18; i++) { // stop iterating over slots we know aren't chests
+    for (let i = 0; i < 27; i++) {
         let item = items[i]
 
         if (!item) continue
@@ -345,7 +345,7 @@ register("tick", () => {
             return
         }
 
-        if (kismetSlot.getLore().includes("§aYou already rerolled a chest!")) {
+        if (kismetSlot.getLore().includes("§5§o§aYou already rerolled a chest!")) {
             ChatLib.chat(`&eAlready rerolled!`)
             chestClaimInfo.skipKismet = true
             indexToClick = 49
