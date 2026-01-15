@@ -303,7 +303,7 @@ const tryParsePet = (line) => {
     const [_, color, pet] = match
     let tier = 3 // Epic
     
-    if (color == "§6") {
+    if (color == "6") {
         tier = 4 // Legendary
     }
 
