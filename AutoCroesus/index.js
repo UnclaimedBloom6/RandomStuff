@@ -336,7 +336,7 @@ register("tick", () => {
         const kismetSlot = items[50]
         tryingToKismet = false
 
-        if (!kismetSlot || kismetSlot.getName() !== "§aReroll Chest") {
+        if (!kismetSlot || kismetSlot.getName() !== "§aReroll Chest" || kismetSlot.getLore().includes("§5§o§eBring a Kismet Feather")) {
             canKismet = false
             ChatLib.chat(`&cCould not find kismets. Auto claiming for ${chestClaimInfo.floor} is disabled until kismetting is turned off or kismets are available to use.`)
             failedIndexes.push(chestClaimInfo.chestSlot + (chestClaimInfo.page - 1) * 54)
@@ -668,7 +668,7 @@ const slotRenderer = register("renderSlot", (slot) => {
     }
 
     const item = slot.getItem()
-    if (!item || !item.getLore().includes("§5§o§8No Chests Opened!")) {
+    if (!item || !item.getLore().includes("§5§o§cNo chests opened yet!")) {
         return
     }
 

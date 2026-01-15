@@ -30,7 +30,7 @@ acPogObj.autosave()
 
 export const numerals = ["", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"]
 const REACH = 4
-export const CHEST_REGEX = /^(§.)(\w+) Chest$/
+export const CHEST_REGEX = /^(§.)(Wood|Gold|Diamond|Emerald|Obsidian|Bedrock)$/
 
 export const formattedBool = (bool) => bool ? "&atrue" : "&cfalse"
 export const formatNumber = (num) => num?.toString()?.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
@@ -55,10 +55,11 @@ export const itemReplacements = {
     "Shiny Wither Chestplate": "WITHER_CHESTPLATE",
     "Shiny Wither Helmet": "WITHER_HELMET",
     "Shiny Necron's Handle": "NECRON_HANDLE",
-    "Wither": "SHARD_WITHER",
-    "Thorn": "SHARD_THORN",
-    "Apex Dragon": "SHARD_APEX_DRAGON",
-    "Power Dragon": "SHARD_POWER_DRAGON",
+    "Wither Shard": "SHARD_WITHER",
+    "Thorn Shard": "SHARD_THORN",
+    "Apex Dragon Shard": "SHARD_APEX_DRAGON",
+    "Power Dragon Shard": "SHARD_POWER_DRAGON",
+    "Scarf Shard": "SHARD_SCARF",
     "Necron Dye": "DYE_NECRON",
     "Livid Dye": "DYE_LIVID",
 }
@@ -136,7 +137,7 @@ export const inCroesus = () => {
 
 export const inRunGui = () => {
     const inv = Player.getContainer()
-    return inv.getName() == "Master Mode The Catacombs - Flo" || /^The Catacombs - Floor [IV]+$/.test(inv.getName())
+    return /^(?:Master )?Catacombs - ([FloorVI\d ]*)$/.test(inv.getName())
 }
 
 export const getCurrPage = () => {
@@ -193,14 +194,14 @@ export const findUnopenedChest = (inv, excludedIndexes=[], page, canKismet=true)
             continue
         }
 
-        if (!item.getLore().includes("§5§o§8No Chests Opened!")) {
+        if (!item.getLore().includes("§5§o§cNo chests opened yet!")) {
             logger.push(`Index ${i} already looted`)
             continue
         }
 
         // Find the floor
         let dungeonType = item.getName().removeFormatting()
-        let floorMatch = item.getLore()[1].match(/^(?:§.)+Tier: §eFloor (\w+)$/)
+        let floorMatch = item.getLore()[1].match(/^(?:§.)+§eFloor (\w+)$/)
         if (!floorMatch) {
             logger.push(`Could not match floor: "${item.getLore()[1]}"`)
             excludedIndexes.push(extendedIndex)
