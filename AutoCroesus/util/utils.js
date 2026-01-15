@@ -291,6 +291,25 @@ const tryParseEssence = (line) => {
     return [sbID, qty]
 }
 
+const tryParsePet = (line) => {
+    // "§5§o§7[Lvl 1] §6Spirit"
+    const match = line.match(/^(?:§.)*\[Lvl 1\] §(.)(\w+)$/)
+
+    if (!match) {
+        return null
+    }
+
+    const [_, color, pet] = match
+    let tier = 3 // Epic
+    
+    if (color == "§6") {
+        tier = 4 // Legendary
+    }
+
+    return [`${pet.toUpperCase()};${tier}`, 1]
+    
+}
+
 const tryParseLine = (line) => {
     const bookInfo = tryParseBook(line)
     if (bookInfo) {
@@ -300,6 +319,11 @@ const tryParseLine = (line) => {
     const essenceInfo = tryParseEssence(line)
     if (essenceInfo) {
         return essenceInfo
+    }
+
+    const petInfo = tryParsePet(line)
+    if (petInfo) {
+        return petInfo
     }
 
     const itemUnformatted = line.removeFormatting().trim()
