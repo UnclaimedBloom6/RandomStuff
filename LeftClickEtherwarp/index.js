@@ -31,6 +31,7 @@ const getSkyblockItemID = (item) => {
 }
 
 const sendUseItem = () => {
+    if (!isHoldingEtherwarpItem()) return
     Client.sendPacket(new C08PacketPlayerBlockPlacement(Player.getHeldItem()?.getItemStack() ?? null))
 }
 
